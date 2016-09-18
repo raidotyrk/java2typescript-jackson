@@ -29,6 +29,9 @@ public class ClassWithGenericTypeTest {
 	public class StringClass extends GenericClass<String> {
 	}
 
+	static class ClassWithGenericTypeParams<K, V> {
+	}
+
 	@Test
 	public void classWithCollections() throws IOException {
 		// Arrange
@@ -48,6 +51,22 @@ public class ClassWithGenericTypeTest {
 	public void classExtendsClassWithGenericTypeParams() throws IOException {
 		// Arrange
 		Module module = TestUtil.createTestModule(null, StringClass.class);
+		Writer out = new StringWriter();
+
+		// Act
+		new ExternalModuleFormatWriter().write(module, out);
+		out.close();
+		System.out.println(out);
+
+		// Assert
+		ExpectedOutputChecker.checkOutputFromFile(out);
+	}
+
+	@Test
+	public void classWithGenericTypeParams() throws IOException {
+		// Arrange
+		Configuration conf = new Configuration();
+		Module module = TestUtil.createTestModule(conf, ClassWithGenericTypeParams.class);
 		Writer out = new StringWriter();
 
 		// Act
