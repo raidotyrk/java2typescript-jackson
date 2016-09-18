@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.util.ExpectedOutputChecker;
@@ -30,6 +31,10 @@ public class ClassWithGenericTypeTest {
 	}
 
 	static class ClassWithGenericTypeParams<K, V> {
+		public String stringField;
+		public K genericFieldK;
+		public V genericFieldV;
+		public Map<String, Boolean> booleansByStrings;
 	}
 
 	@Test
