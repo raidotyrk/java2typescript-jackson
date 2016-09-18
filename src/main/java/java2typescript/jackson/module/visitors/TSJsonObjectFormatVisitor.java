@@ -22,20 +22,14 @@ import static java2typescript.jackson.module.visitors.TSJsonFormatVisitorWrapper
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.beans.Transient;
 import java.lang.reflect.Method;
-import java2typescript.jackson.module.grammar.AnyType;
-import java2typescript.jackson.module.grammar.FunctionType;
-import java2typescript.jackson.module.grammar.ClassType;
-import java2typescript.jackson.module.grammar.TypeDeclarationType;
+import java.lang.reflect.Type;
 import java2typescript.jackson.module.grammar.VoidType;
-import java2typescript.jackson.module.grammar.base.AbstractType;
 
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
@@ -45,8 +39,9 @@ import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.type.TypeBindings;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-
 import java2typescript.jackson.module.Configuration;
+import java2typescript.jackson.module.grammar.*;
+import java2typescript.jackson.module.grammar.base.AbstractType;
 
 public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassType> implements JsonObjectFormatVisitor {
 
@@ -55,7 +50,16 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 	public TSJsonObjectFormatVisitor(ABaseTSJsonFormatVisitor<?> parentHolder, String className, Class clazz, Configuration conf) {
 		super(parentHolder, conf);
 		type = new ClassType(className);
+		type.setGenericTypes(getGenericTypes(clazz.getTypeParameters()));
 		this.clazz = clazz;
+	}
+
+	private GenericTypes getGenericTypes(Type[] genericTypes) {
+		GenericTypes generics = new GenericTypes();
+		for (Type type : genericTypes) {
+			generics.addGenericType(new GenericType(type.getTypeName()));
+		}
+		return generics;
 	}
 
 	private void addField(String name, AbstractType fieldType) {
