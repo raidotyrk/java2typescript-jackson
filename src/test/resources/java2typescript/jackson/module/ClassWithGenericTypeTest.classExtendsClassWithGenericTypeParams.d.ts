@@ -6,3 +6,8 @@ export interface StringClass {
     someField: string;
     genericList: string[];
 }
+
+export interface BooleanClass {
+    someField: boolean;
+    genericList: boolean[];
+}

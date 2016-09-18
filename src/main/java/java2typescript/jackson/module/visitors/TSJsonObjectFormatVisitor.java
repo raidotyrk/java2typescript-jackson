@@ -24,7 +24,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java2typescript.jackson.module.grammar.VoidType;
 
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
@@ -180,6 +179,10 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 				if (type == null) {
 					throw new IllegalStateException("Missing type for property '" + writer.getName() + "'");
 				}
+				Type genericType = getGenericType(type, writer);
+				if (genericType != null) {
+					return new GenericType(genericType.getTypeName());
+				}
 				return getTSTypeForHandler(this, ser, type, conf);
 			} else {
 				return AnyType.getInstance();
@@ -190,6 +193,17 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 					"Error when serializing %s, you should add a custom mapping for it", type.getRawClass()), e);
 		}
 
+	}
+
+	private Type getGenericType(JavaType type, BeanProperty writer) {
+		AnnotatedMember member = writer.getMember();
+		Class<?> rawType = member.getRawType();
+		Type genericType = member.getGenericType();
+		boolean isGenericResolvedFromSubclass = !type.hasRawClass(Object.class);
+		boolean isGenericType =
+				!rawType.toString().equals(genericType.toString())
+				&& !isGenericResolvedFromSubclass;
+		return isGenericType ? genericType : null;
 	}
 
 	protected JsonSerializer<java.lang.Object> getSer(BeanProperty writer) throws JsonMappingException {

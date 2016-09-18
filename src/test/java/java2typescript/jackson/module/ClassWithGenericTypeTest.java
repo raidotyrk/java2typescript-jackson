@@ -3,6 +3,7 @@ package java2typescript.jackson.module;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.util.ExpectedOutputChecker;
@@ -27,7 +28,14 @@ public class ClassWithGenericTypeTest {
 	public class StringClass extends GenericClass<String> {
 	}
 
+	public class BooleanClass extends GenericClass<Boolean> {
+	}
+
 	static class ClassWithGenericTypeParams<K, V> {
+		public String stringField;
+		public K genericFieldK;
+		public V genericFieldV;
+		public Map<String, Boolean> booleansByStrings;
 	}
 
 	@Test
@@ -41,7 +49,7 @@ public class ClassWithGenericTypeTest {
 	@Test
 	public void classExtendsClassWithGenericTypeParams() throws IOException {
 		// Arrange
-		Module module = TestUtil.createTestModule(null, StringClass.class);
+		Module module = TestUtil.createTestModule(null, StringClass.class, BooleanClass.class);
 
 		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
