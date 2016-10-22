@@ -1,9 +1,5 @@
 export module modName {
 
-    export interface StringClass {
-        someField: string;
-    }
-
     export enum ChangedEnumName {
         VAL1,
         VAL2,
