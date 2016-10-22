@@ -39,10 +39,6 @@ public class DefinitionGeneratorTest {
 		VAL1, VAL2, VAL3
 	}
 
-	class GenericClass<T> {
-		public T someField;
-	}
-
 	class TestClass {
 		public String _String;
 		public boolean _boolean;
@@ -60,10 +56,6 @@ public class DefinitionGeneratorTest {
 		public String aMethod(boolean recParam, String param2) {
 			return "toto";
 		}
-	}
-
-	public class StringClass extends GenericClass<String> {
-
 	}
 
 	@Test
@@ -121,6 +113,6 @@ public class DefinitionGeneratorTest {
 	}
 
 	private Module createTestModule() throws JsonMappingException {
-		return TestUtil.createTestModule(null, TestClass.class, StringClass.class);
+		return TestUtil.createTestModule(null, TestClass.class);
 	}
 }
