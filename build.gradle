@@ -23,7 +23,7 @@ println("Project version (based on semver-git): " + project.version)
 
 
 apply plugin: 'java'
-sourceCompatibility = 1.6
+sourceCompatibility = 1.8
 
 
 repositories {
