@@ -1,0 +1,44 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath group: 'com.cinnober.gradle', name: 'semver-git', version: '2.2.0'
+	}
+}
+
+plugins {
+	id "com.gorylenko.gradle-git-properties" version "1.4.17"
+}
+
+group 'com.github.atsu85.java2typescript-jackson'
+
+
+ext {
+	jacksonCoreVersion = "2.6.4"
+	snapshotSuffix = "c<count>" // used by semver-git plugin when there are commits after previous tag
+}
+apply plugin: 'com.cinnober.gradle.semver-git' // derive gradle project version based on git tag
+println("Project version (based on semver-git): " + project.version)
+
+
+apply plugin: 'java'
+sourceCompatibility = 1.6
+
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile(
+			"com.fasterxml.jackson.core:jackson-annotations:$jacksonCoreVersion",
+			"com.fasterxml.jackson.core:jackson-databind:$jacksonCoreVersion",
+
+			'com.google.guava:guava:15.0',
+	)
+
+	testCompile(
+			'junit:junit:4.8.2',
+	)
+}
