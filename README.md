@@ -1,153 +1,68 @@
-[![Release](https://img.shields.io/github/release/raphaeljolivet/java2typescript.svg?label=latest release is)](https://jitpack.io/#raphaeljolivet/java2typescript)
+This project generates TypeScript code from given Java Classes
 
-Continuous Integration [![Build Status](https://travis-ci.org/raphaeljolivet/java2typescript.svg)](https://travis-ci.org/raphaeljolivet/java2typescript/) (for last commit on any branch)
+## Output format
+Java classes are converted to TypeScript interfaces.
 
 
-## Purpose
+### Module (generated output) format
+TypeScript has concept of [internal](http://www.typescriptlang.org/Handbook#modules) and [external](http://www.typescriptlang.org/Handbook#modules-going-external) modules, that have slightly different format (see the test output for [internal](src/test/resources/java2typescript/jackson/module/DefinitionGeneratorTest.internalModuleFormat.d.ts) vs [external](src/test/resources/java2typescript/jackson/module/DefinitionGeneratorTest.externalModuleFormat.d.ts) module format). By default internal module format is used (that adds one line before and after content of external module format).
 
-**Java2Typescript** provides a bridge between a **Java** REST service definition and a **Typescript** client. 
+External module format can be used by using different ModuleWriter (ExternalModuleFormatWriter - see [the test for an example](src/test/java/java2typescript/jackson/module/DefinitionGeneratorTest.java#L85-L97))
 
-It enables to expose the full DTO model and REST services API as a clean typescript definition file, thus enabling strong type checking on the model of your application.
 
-This project is composed of 3 modules :
-* **[java2typescript-jackson](java2typescript-jackson)**: A [Jackson](http://jackson.codehaus.org/) module that generate **typescript** definition files for Java classes, using a Jackson ObjectMapper.
-* **[java2typescript-jaxrs](java2typescript-jaxrs)**: An extension to **java2typescript-jackson** that takes a [JAX-RS](https://jax-rs-spec.java.net/) annotated java class and produces both :
- * A Typescript definition file of the service (`.d.ts`), together with description of all needed DTO objects. 
- * An implementation `.js `of the above definition as REST client stub. 
-* **[java2typescript-maven-plugin](java2typescript-maven-plugin)**: A maven plugin to automate the generation of `.d.ts` and `.js` implementation of REST services.
-* A **[sample web application](sample-web-app)** that demonstrate the usage of **java2typescript**
+### Ignored methods
+When generating TypeScript from Java classes <sup>(actually when Java classes are analysed)</sup>, some methods are excluded:
+* Non-public methods
+* Methods annotated with @java.beans.Transient
+* Java Bean property getters/setters are excluded even if field doesn't exist with exact name (field is generated based on corresponding Java Bean property name instead)
+* Methods ignored by the configuration:
 
-## Big picture
-
-Here is a schema of the workflow for a typical project using **j2ts** :
-![j2ts workflow](img/j2ts-workflow.png)
-
-There are only two source files here :
-* Server side: `AppRest.java` with annotated JAX-RS services
-* Client side: `App.ts` 
-
-The detailed workflow is:
-
-1. `AppRest.java` contains the annotated **JAX-RS** service definition
-2. **j2ts** compiles the REST service definition into a `.d.ts` description file, and a `.js` file (runtime implementation)
-3. `App.ts` imports and uses the `.d.ts` file
-4. `App.ts` is compiled into a `App.js` file (by typescript compiler)
-
-# Usage
-
-Please refer to the documentation of the [maven plugin](java2typescript-maven-plugin) and the example below
-
-# Example
-
-**java2typescript** handles all the HTTP REST standard itself, and provide REST services as vanilla Typescript methods, regardless of the HTTP method / mime to use.
-
-Consider the following JAX-RS service 
-```java
-@Path( "/people" ) 
-public interface PeopleRestService {
-	
-	
-	@Produces( { MediaType.APPLICATION_JSON } )
-	@GET
-	public Collection< Person > getPeoples( @QueryParam( "page") @DefaultValue( "1" ) final int page ) {
-		return peopleService.getPeople( page, 5 );
-	}
-
-	@Produces( { MediaType.APPLICATION_JSON } )
-	@Path( "/{email}" )
-	@GET
-	public Person getPeople( @PathParam( "email" ) final String email ) {
-		return peopleService.getByEmail( email );
-	}
-}
+```Java
+		Configuration conf = new Configuration();
+		conf.addIngoredMethod("blacklistedMethod");
 ```
 
-The **[maven plugin](java2typescript-maven-plugin)** will produce the following typescript definition file :
+See the [tests for excluded methods](src/test/java/java2typescript/jackson/module/ExcludedMethodsTest.java#L33-L65) for details.
 
-```typescript
-export module People {
+> Note: You can also extend the configuration and overwrite [`isIgnoredMethod`](src/main/java/java2typescript/jackson/module/Configuration.java#L44-L49) method to programmatically make the decision (most likely based on method signature: parameters, return type, declaring class, annotations, ...)
 
-export interface PeopleRestService {
-    getPeopleList(page: number): Person[];
-    getPeople(email: string): Person;
-}
 
-export interface Person {
-    email: string;
-    firstName: string;
-    lastName: string;
-}
+### Enums
+Java enums are converted to TypeScript enums by default,
+but TypeSafe enum pattern can be used to force generating classes instead of enums (see [the description of the issue](https://github.com/raphaeljolivet/java2typescript/issues/13).
+Example [output](src/test/resources/java2typescript/jackson/module/WriterPreferencesTest.enumToEnumPattern.d.ts) from test that [turns on this preference](src/test/java/java2typescript/jackson/module/WriterPreferencesTest.java#L44) using
 
-export var rootUrl: string;
-export var peopleRestService: PeopleRestService;
-export var adapter: (httpMethod: string, path: string, getParams: Object, postParams: Object, body: any)=> void;
-}
+```Java
+mWriter.preferences.useEnumPattern();
 ```
 
-The module **People** contains both the definition of the DTO **Person** and the service **PeopleRestService**, it also provides 3 properties :
-* **rootURL** : URL of the service : Should be set before usage
-* **peopleRESTService** : An instance of the service
-* **adapter** : An adapter for RESt service call. Set to Jquery adapter by default.
+### Mapping specific java classes to custom TypeScript types
+There are scenarios when You might want to use different TypeScript type instead of specific Java Type. There are several options for doing this depending how You want it to be done:
 
-Then, in your application, you can call the service like so 
-```typescript
-/// <reference path="People.d.ts" />
-import p = People;
-import Person = p.Person;
-import prs = p.peopleRestService;
+##### Renaming Type and emitting it to the output
+Logic, that determines the name of TypeScript type based on Java class is implemented using [TSTypeNamingStrategy](src/main/java/java2typescript/jackson/module/conf/typename/TSTypeNamingStrategy.java) interface. Currently there are two implementations provided out of the box by this library:
+1. [SimpleJacksonTSTypeNamingStrategy](src/main/java/java2typescript/jackson/module/conf/typename/SimpleJacksonTSTypeNamingStrategy.java) - The default, uses Java class name for TypeScript type, unless class has annotation, that specifies custom name (see bellow).
+1. [WithEnclosingClassTSTypeNamingStrategy](jackson/module/conf/typename/WithEnclosingClassTSTypeNamingStrategy.java) - extends SimpleJacksonTSTypeNamingStrategy to include enclosing class name as a prefix (`javaClass.getName()` without package ).
 
-p.rootUrl = "http://someurl/root/";
+###### Renaming Type using annotation on the Java class (SimpleJacksonTSTypeNamingStrategy)
+You can use `@com.fasterxml.jackson.annotation.JsonTypeName("ChangedEnumName")` annotation on the Java type to use different name in TypeScript output (interface/enum with different name is also generated to the output).
+See the [example from the test](src/test/java/java2typescript/jackson/module/DefinitionGeneratorTest.java#L37).
 
-var personList : Person[] = prs.getPeopleList(1);
-var onePerson : Person = prs.getPeople("rrr@eee.com");
+###### Renaming Types using custom (re)naming strategy
+To tweak naming TypeScript types for Your specific needs, You can provide an implementation of [TSTypeNamingStrategy](src/main/java/java2typescript/jackson/module/conf/typename/TSTypeNamingStrategy.java), such as [SimpleJacksonTSTypeNamingStrategy](src/main/java/java2typescript/jackson/module/conf/typename/SimpleJacksonTSTypeNamingStrategy.java) (or write Your own) to [Configuration.setNamingStrategy(namingStrategy)](src/main/java/java2typescript/jackson/module/Configuration.java#L61).
 
-```
- 
-Don't forget to import the generated file **People.js** in the final HTML page.
+See the test [TypeRenamingWithEnclosingClassTest](src/test/java/java2typescript/jackson/module/TypeRenamingWithEnclosingClassTest.java#L34) and the [expected output of the test](src/test/resources/java2typescript/jackson/module/TypeRenamingWithEnclosingClassTest.twoClassesWithSameName.d.ts#L1).
 
 
-### Installation
+##### Using different type, not emitting it to the output
+One common use-case, could be for instance Joda or Java8 LocalDate or Date or Calendar to TypeScript/JavaScript Date.
+See the test [source](src/test/java/java2typescript/jackson/module/CustomTypeDefinitionGeneratorTest.java#L57) and [output](src/test/resources/java2typescript/jackson/module/CustomTypeDefinitionGeneratorTest.classWithCustomTypeFields.d.ts) as an example.
 
-To install the library using Maven add [JitPack](https://jitpack.io/) repository and java2typescript dependency:
+Mapping Java type to TypeScript type is done using:
 
-```xml
-...
-<repositories>
-	<repository>
-	    <id>jitpack.io</id>
-	    <url>https://jitpack.io</url>
-	</repository>
-</repositories>
-...
-<dependencies>
-    <dependency>
-        <groupId>com.github.raphaeljolivet.java2typescript</groupId>
-        <artifactId>java2typescript-maven-plugin</artifactId>
-        <version>v0.3.1</version><!-- see notes bellow to get either snapshot or specific commit or tag or other version -->
-    </dependency>
-</dependencies>
-...
+```Java
+new Configuration().addType(CustomDate.class, DateType.getInstance())
 ```
 
-> Note, artifacts for this project are built automatically by [JitPack](https://jitpack.io/docs/#how-to) based on github repository.
-
-> Note, if You are only interested in generating TypeScript definitions from Java classes, You can use `java2typescript-jackson` instead of `java2typescript-maven-plugin` as the artifact id.
-
-> Note, version can be replaced with
-* either any [released version of this project](../../releases) ([![Release](https://img.shields.io/github/release/raphaeljolivet/java2typescript.svg?label=latest release is)](https://jitpack.io/#raphaeljolivet/java2typescript))
-* or any [git tag of this project](../../tags)
-* or any [git commit hash](../../commits/master)
-* or with `master-SNAPSHOT` - to indicate the latest commit of master branch (NB! Dependency managers, such as Maven cache SNAPSHOTs by default, see [JitPack documentation](https://jitpack.io/docs/#snapshots))
-
-
-# Licence
-
-This project is licenced under the [Apache v2.0 Licence](http://www.apache.org/licenses/LICENSE-2.0.html)
-
-
-# Credits
-
-Jackson module is inspired from the [jsonSchema module](https://github.com/FasterXML/jackson-module-jsonSchema)
-
-
+where `DateType` class specifies the expected output type name.
 
