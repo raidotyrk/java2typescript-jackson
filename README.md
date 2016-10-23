@@ -66,3 +66,5 @@ new Configuration().addType(CustomDate.class, DateType.getInstance())
 
 where `DateType` class specifies the expected output type name.
 
+## Building this project
+`./gradlew build` builds and tests the project.
