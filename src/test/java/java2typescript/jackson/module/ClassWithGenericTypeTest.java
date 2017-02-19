@@ -1,6 +1,8 @@
 package java2typescript.jackson.module;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +63,22 @@ public class ClassWithGenericTypeTest {
 		Module module = TestUtil.createTestModule(conf, ClassWithGenericTypeParams.class);
 
 		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
+	}
+
+	@Test
+	public void debug() throws Exception {
+		// Arrange
+		Module module = TestUtil.createTestModule(null, Response.class);
+
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
+	}
+
+	class Response {
+		public ValueClass<String> stringValueClassField;
+	}
+
+	public static class ValueClass<T> {
+		public T genericValue;
 	}
 
 }
