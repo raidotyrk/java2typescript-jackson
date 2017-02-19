@@ -1,7 +1,13 @@
 package java2typescript.jackson.module;
 
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
+import com.fasterxml.jackson.databind.type.TypeBindings;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import java2typescript.jackson.module.conf.typename.TSTypeNamingStrategy;
 import java2typescript.jackson.module.grammar.*;
 import java2typescript.jackson.module.grammar.base.AbstractType;
@@ -12,11 +18,9 @@ public class TypeUtil {
 			Class<?> clazz,
 			Module module,
 			TSTypeNamingStrategy namingStrategy) {
-		if (clazz == boolean.class) {
+		if (clazz == boolean.class || clazz == Boolean.class) {
 			return BooleanType.getInstance();
-		} else if (clazz == int.class) {
-			return NumberType.getInstance();
-		} else if (clazz == double.class) {
+		} else if (isTypeScriptTypeNumber(clazz)) {
 			return NumberType.getInstance();
 		} else if (clazz == String.class) {
 			return StringType.getInstance();
@@ -26,8 +30,19 @@ public class TypeUtil {
 		} else if (clazz.isArray()) {
 			Class<?> componentType = clazz.getComponentType();
 			return new ArrayType(getTypeScriptTypeFromJavaClass(componentType, module, namingStrategy));
+		} else if (Map.class.isAssignableFrom(clazz)) {
+			throw new RuntimeException("TODO implementation for Map " + clazz);
+		} else if (Collection.class.isAssignableFrom(clazz)) {
+			throw new RuntimeException("TODO implementation for Collection " + clazz);
 		}
-		throw new UnsupportedOperationException();
+		return new ClassType(namingStrategy.getName(getJavaTypeFromClass(clazz)));
+	}
+
+	private static boolean isTypeScriptTypeNumber(Class<?> clazz) {
+		return Number.class.isAssignableFrom(clazz)
+				|| clazz == double.class
+				|| clazz == int.class
+				|| clazz == long.class;
 	}
 
 	public static EnumType parseTypeScriptEnumTypeOrGetFromCache(
@@ -47,4 +62,21 @@ public class TypeUtil {
 			return (EnumType) namedType;
 		}
 	}
+
+	private static JavaType getJavaTypeFromClass(Class<?> clazz) {
+		TypeBindings bindings = new TypeBindings(TypeFactory.defaultInstance(), clazz);
+		return bindings.resolveType(clazz);
+	}
+
+	public static Class<?> getClass(Type type) {
+		Class<?> typeClass;
+		String typeName = type.getTypeName();
+		try {
+			typeClass = Class.forName(typeName);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		return typeClass;
+	}
+
 }

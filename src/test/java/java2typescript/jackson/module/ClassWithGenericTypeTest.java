@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.util.ExpectedOutputChecker;
@@ -20,6 +21,15 @@ public class ClassWithGenericTypeTest {
 		public Collection<Boolean> booleanCollection;
 		public Boolean[] booleanWrapperArray;
 		public boolean[] booleanPrimitiveArray;
+		public long[] longPrimitiveArray;
+		public Long[] longWrapperArray;
+	}
+
+	static class ClassWithListOfStrings {
+		public List<String> stringList;
+	}
+	static class ClassWithMapOfBooleansByStrings {
+		public Map<String, Boolean> booleansByStrings;
 	}
 
 	class GenericClass<T> {
@@ -28,6 +38,9 @@ public class ClassWithGenericTypeTest {
 	}
 
 	public class StringClass extends GenericClass<String> {
+	}
+
+	public class AtomicIntegerClass extends GenericClass<AtomicInteger> {
 	}
 
 	public class BooleanClass extends GenericClass<Boolean> {
@@ -49,9 +62,27 @@ public class ClassWithGenericTypeTest {
 	}
 
 	@Test
+	public void debug_classWithCollections_field_ListOfStrings() throws IOException {
+		// Arrange
+		Module module = TestUtil.createTestModule(null, ClassWithListOfStrings.class);
+		Writer out = new StringWriter();
+
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
+	}
+
+	@Test
+	public void debug_classWithCollections_field_MapOfBooleansByStrings() throws IOException {
+		// Arrange
+		Module module = TestUtil.createTestModule(null, ClassWithMapOfBooleansByStrings.class);
+		Writer out = new StringWriter();
+
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
+	}
+
+	@Test
 	public void classExtendsClassWithGenericTypeParams() throws IOException {
 		// Arrange
-		Module module = TestUtil.createTestModule(null, StringClass.class, BooleanClass.class);
+		Module module = TestUtil.createTestModule(null, StringClass.class, BooleanClass.class, AtomicIntegerClass.class);
 
 		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}

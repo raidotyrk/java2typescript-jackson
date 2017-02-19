@@ -11,3 +11,9 @@ export interface BooleanClass {
     someField: boolean;
     genericList: boolean[];
 }
+
+export interface AtomicIntegerClass {
+    someField: number;
+    genericList: number[];
+}
+

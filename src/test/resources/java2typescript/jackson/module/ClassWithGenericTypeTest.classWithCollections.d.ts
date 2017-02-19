@@ -4,4 +4,6 @@ export interface ClassWithCollections {
     booleanCollection: boolean[];
     booleanWrapperArray: boolean[];
     booleanPrimitiveArray: boolean[];
+    longPrimitiveArray: number[];
+    longWrapperArray: number[];
 }

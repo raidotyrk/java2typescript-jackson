@@ -23,7 +23,9 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JavaType;
@@ -36,10 +38,16 @@ import com.fasterxml.jackson.databind.introspect.AnnotationMap;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeBindings;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.google.common.collect.Lists;
 import java2typescript.jackson.module.Configuration;
+import java2typescript.jackson.module.TypeUtil;
 import java2typescript.jackson.module.grammar.*;
+import java2typescript.jackson.module.grammar.base.AbstractNamedType;
+import java2typescript.jackson.module.grammar.base.AbstractPrimitiveType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
 
 public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassType> implements JsonObjectFormatVisitor {
@@ -57,6 +65,21 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 		GenericTypes generics = new GenericTypes();
 		for (Type type : genericTypes) {
 			generics.addGenericType(new GenericType(type.getTypeName()));
+		}
+		return generics;
+	}
+
+	private GenericTypes getGenericTypesWithTSNames(Type[] genericTypes) {
+		GenericTypes generics = new GenericTypes();
+		for (Type type : genericTypes) {
+			if(type instanceof TypeVariable) {
+				TypeVariable typeVariable = (TypeVariable) type;
+				generics.addGenericType(new GenericType(typeVariable.getTypeName()));
+				continue;
+			}
+			Class<?> typeClass = TypeUtil.getClass(type);
+			String rawTsTypeName = getTypeScriptTypeName(typeClass);
+			generics.addGenericType(new GenericType(rawTsTypeName));
 		}
 		return generics;
 	}
@@ -159,6 +182,10 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 			throw new IllegalArgumentException("Null writer");
 		}
 		JavaType type = writer.getType();
+		return getTSTypeForProperty(writer, type);
+	}
+
+	private AbstractType getTSTypeForProperty(BeanProperty writer, JavaType type) {
 		if (type.getRawClass().equals(Void.TYPE)) {
 			return VoidType.getInstance();
 		}
@@ -179,9 +206,11 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 				if (type == null) {
 					throw new IllegalStateException("Missing type for property '" + writer.getName() + "'");
 				}
-				Type genericType = getGenericType(type, writer);
+				Type genericType = getGenericType(writer);
 				if (genericType != null) {
-					return new GenericType(genericType.getTypeName());
+					if (!isSupportedWithoutGenerics(type)) {
+						return getTsTypeForGenericType(type, genericType);
+					}
 				}
 				return getTSTypeForHandler(this, ser, type, conf);
 			} else {
@@ -195,15 +224,66 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 
 	}
 
-	private Type getGenericType(JavaType type, BeanProperty writer) {
+	private boolean isSupportedWithoutGenerics(JavaType jacksonType) {
+		if (jacksonType instanceof CollectionType || jacksonType instanceof MapType) {
+			return true;
+		}
+		AbstractType tsType = getTypeScriptTypeFromJavaClass(jacksonType.getRawClass());
+		return tsType instanceof AbstractPrimitiveType;
+	}
+
+	private AbstractType getTsTypeForGenericType(JavaType type, Type genericType) {
+		if (genericType instanceof TypeVariable) {
+			String genericTypeName = genericType.getTypeName();
+			return new GenericType(genericTypeName);
+		}
+		if (genericType instanceof ParameterizedType) {
+			AbstractType tsType = getTypeScriptTypeFromJavaClass(type.getRawClass());
+			if (tsType instanceof ClassType) {
+				ParameterizedType parameterizedType = (ParameterizedType) genericType;
+				Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+				ClassType classType = (ClassType) tsType;
+				classType.setGenericTypes(getGenericTypesWithTSNames(actualTypeArguments));
+				addGenericTypeToModule(type.getRawClass());
+			} else {
+				throw new RuntimeException("TODO return TypeScript type for " + tsType);
+			}
+			return tsType;
+
+		} else {
+			throw new RuntimeException("Unhandled generic type: " + genericType);
+		}
+	}
+
+	private AbstractType getTypeScriptTypeFromJavaClass(Class<?> clazz) {
+		return TypeUtil.getTypeScriptTypeFromJavaClass(clazz, getModule(), conf.getNamingStrategy());
+	}
+
+	private void addGenericTypeToModule(Class<?> rawClass) {
+		// can't use JsonFormatVisitable.acceptJsonFormatVisitor() to add type with GENERICS to module,
+		// as otherwise generic type parameters would be replaced with types declared by the first class that uses the typeWithGenerics
+		// which would usually be incorrect for other classes
+		getModule().addClassesToParse(Lists.newArrayList(rawClass));
+	}
+
+	private String getTypeScriptTypeName(Class<?> rawClass) {
+		AbstractType tsType = TypeUtil.getTypeScriptTypeFromJavaClass(rawClass, getModule(), conf.getNamingStrategy());
+		if (tsType instanceof AbstractNamedType) {
+			return ((AbstractNamedType) tsType).getName();
+		} else if (tsType instanceof AbstractPrimitiveType) {
+			return ((AbstractPrimitiveType) tsType).getToken();
+		} else {
+			throw new RuntimeException("TODO");
+		}
+	}
+
+	private Type getGenericType(BeanProperty writer) {
 		AnnotatedMember member = writer.getMember();
-		Class<?> rawType = member.getRawType();
 		Type genericType = member.getGenericType();
-		boolean isGenericResolvedFromSubclass = !type.hasRawClass(Object.class);
-		boolean isGenericType =
-				!rawType.toString().equals(genericType.toString())
-				&& !isGenericResolvedFromSubclass;
-		return isGenericType ? genericType : null;
+		if(genericType instanceof ParameterizedType || genericType instanceof TypeVariable) {
+			return genericType;
+		}
+		return null;
 	}
 
 	protected JsonSerializer<java.lang.Object> getSer(BeanProperty writer) throws JsonMappingException {
