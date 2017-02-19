@@ -15,27 +15,15 @@
  ******************************************************************************/
 package java2typescript.jackson.module.visitors;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.*;
+import java2typescript.jackson.module.Configuration;
+import java2typescript.jackson.module.TypeUtil;
 import java2typescript.jackson.module.grammar.EnumType;
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.grammar.base.AbstractNamedType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonBooleanFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonIntegerFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonMapFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNullFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNumberFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
-
-import java2typescript.jackson.module.Configuration;
 
 public class TSJsonFormatVisitorWrapper extends ABaseTSJsonFormatVisitor implements
 		JsonFormatVisitorWrapper {
@@ -93,18 +81,7 @@ public class TSJsonFormatVisitorWrapper extends ABaseTSJsonFormatVisitor impleme
 	}
 
 	public EnumType parseEnumOrGetFromCache(Module module, JavaType javaType) {
-		String name = getName(javaType);
-		AbstractType namedType = module.getNamedTypes().get(name);
-		if (namedType == null) {
-			EnumType enumType = new EnumType(name);
-			for (Object val : javaType.getRawClass().getEnumConstants()) {
-				enumType.getValues().add(val.toString());
-			}
-			module.getNamedTypes().put(name, enumType);
-			return enumType;
-		} else {
-			return (EnumType) namedType;
-		}
+		return TypeUtil.parseTypeScriptEnumTypeOrGetFromCache(javaType, module, conf.getNamingStrategy());
 	}
 
 	@Override

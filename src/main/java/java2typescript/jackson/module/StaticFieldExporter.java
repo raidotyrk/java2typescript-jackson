@@ -30,12 +30,14 @@ public class StaticFieldExporter {
 	
 	private final Module module;
 	private final TSJsonFormatVisitorWrapper tsJsonFormatVisitorWrapper;
+	private final Configuration conf;
 
 	public StaticFieldExporter(Module module, Configuration conf) {
 		this.module = module;
 		if(conf == null) {
 			conf = new Configuration();
 		}
+		this.conf = conf;
 		tsJsonFormatVisitorWrapper = new TSJsonFormatVisitorWrapper(module, conf);
 	}
 
@@ -83,7 +85,7 @@ public class StaticFieldExporter {
 
 	private Value constructValue(Module module, Class<?> type, Object rawValue)
 			throws IllegalArgumentException, IllegalAccessException {
-		AbstractType tsType = TypeUtil.getTypeScriptTypeFromJavaClass(type, module, tsJsonFormatVisitorWrapper);
+		AbstractType tsType = TypeUtil.getTypeScriptTypeFromJavaClass(type, module, conf.getNamingStrategy());
 		if (type == boolean.class) {
 			return new Value(tsType, rawValue);
 		} else if (type == int.class) {
