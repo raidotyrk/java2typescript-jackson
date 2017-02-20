@@ -54,12 +54,11 @@ public class WriterPreferencesTest {
 		mWriter.preferences.useEnumPattern();
 
 		Module module = TestUtil.createTestModule(null, Enum.class);
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		mWriter.write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);
@@ -72,12 +71,11 @@ public class WriterPreferencesTest {
 		mWriter.preferences.useStringLiteralTypeForEnums();
 
 		Module module = TestUtil.createTestModule(null, Enum.class, EnumOneValue.class);
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		mWriter.write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);
@@ -90,12 +88,11 @@ public class WriterPreferencesTest {
 		mWriter.preferences.useStringLiteralTypeForEnums(true);
 
 		Module module = TestUtil.createTestModule(null, Enum.class, EnumOneValue.class);
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		mWriter.write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);
@@ -108,12 +105,11 @@ public class WriterPreferencesTest {
 		mWriter.preferences.useEnumPattern(); // should be ignored when no enums found
 
 		Module module = TestUtil.createTestModule(null, Dummy.class);
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		mWriter.write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);
@@ -131,12 +127,11 @@ public class WriterPreferencesTest {
 		List<Class<?>> toConvert = new ArrayList<Class<?>>();
 		toConvert.add(Constants.class);
 		new StaticFieldExporter(module, conf).export(toConvert);
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		writer.write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);

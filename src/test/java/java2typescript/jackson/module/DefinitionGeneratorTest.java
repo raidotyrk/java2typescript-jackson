@@ -17,21 +17,18 @@ package java2typescript.jackson.module;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import java2typescript.jackson.module.writer.AmbientModuleFormatWriter;
-import org.junit.Test;
-
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.JsonMappingException;
-
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.util.ExpectedOutputChecker;
 import java2typescript.jackson.module.util.TestUtil;
+import java2typescript.jackson.module.writer.AmbientModuleFormatWriter;
 import java2typescript.jackson.module.writer.ExternalModuleFormatWriter;
+import org.junit.Test;
 
 public class DefinitionGeneratorTest {
 
@@ -63,12 +60,11 @@ public class DefinitionGeneratorTest {
 	public void internalModuleFormat() throws IOException {
 		// Arrange
 		Module module = createTestModule();
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		module.write(out); // for backwards compatibility the same as `new InternalModuleFormatWriter().write(module, out);`
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);
@@ -78,12 +74,11 @@ public class DefinitionGeneratorTest {
 	public void externalModuleFormat() throws IOException {
 		// Arrange
 		Module module = createTestModule();
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		new ExternalModuleFormatWriter().write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);
@@ -102,12 +97,11 @@ public class DefinitionGeneratorTest {
 	public void classWithMethodReturningThis() throws IOException {
 		// Arrange
 		Module module = TestUtil.createTestModule(null, RecursiveTestClass.class);
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		new ExternalModuleFormatWriter().write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);
@@ -117,12 +111,11 @@ public class DefinitionGeneratorTest {
 	public void ambientModuleFormat() throws IOException {
 		// Arrange
 		Module module = createTestModule();
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		new AmbientModuleFormatWriter().write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);

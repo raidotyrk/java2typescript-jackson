@@ -2,7 +2,6 @@ package java2typescript.jackson.module;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,12 +32,11 @@ public class ClassWithGenericTypeTest {
 	public void classWithCollections() throws IOException {
 		// Arrange
 		Module module = TestUtil.createTestModule(null, ClassWithCollections.class);
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		new ExternalModuleFormatWriter().write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);
@@ -48,12 +46,11 @@ public class ClassWithGenericTypeTest {
 	public void classExtendsClassWithGenericTypeParams() throws IOException {
 		// Arrange
 		Module module = TestUtil.createTestModule(null, StringClass.class);
-		Writer out = new StringWriter();
+		StringWriter out = new StringWriter();
 
 		// Act
 		new ExternalModuleFormatWriter().write(module, out);
 		out.close();
-		System.out.println(out);
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out);

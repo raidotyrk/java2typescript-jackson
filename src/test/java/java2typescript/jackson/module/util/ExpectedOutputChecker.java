@@ -1,6 +1,7 @@
 package java2typescript.jackson.module.util;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.Collections;
@@ -16,8 +17,10 @@ import org.junit.Assert;
 
 public class ExpectedOutputChecker {
 
-	public static void checkOutputFromFile(Writer out) {
-		compareFileContent(out, getCaller());
+	public static void checkOutputFromFile(StringWriter out) {
+		StackTraceElement caller = getCaller();
+		printBanner(out.toString());
+		compareFileContent(out, caller);
 	}
 
 	public static void checkOutputFromFileEquals(Writer out) {
@@ -26,6 +29,7 @@ public class ExpectedOutputChecker {
 	private static StackTraceElement getCaller() {
 		return new Throwable().getStackTrace()[2];
 	}
+
 	private static void compareFileContent(Writer out, StackTraceElement testMethodStackTraceElem) {
 		// Can't rely on specific order of classes/fields/methods, so file content equality can't be used.
 		// Using naive approach to check that actual output contains exactly the same lines as expected output
@@ -81,6 +85,10 @@ public class ExpectedOutputChecker {
 				})
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
+	}
+
+	private static void printBanner(String bannerBody) {
+		System.out.println(bannerBody);
 	}
 
 }
