@@ -19,7 +19,7 @@ import org.junit.Assert;
 
 public class ExpectedOutputChecker {
 
-	public static void writeAndCheckOutputFromFile(Module module, ModuleWriter moduleFormatWriter) throws IOException {
+	public static void writeAndCheckOutputFromFile(Module module, ModuleWriter moduleFormatWriter) {
 		StringWriter out = new StringWriter();
 
 		// Act
@@ -28,7 +28,6 @@ public class ExpectedOutputChecker {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		out.close();
 
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out, getCaller());
