@@ -17,11 +17,9 @@ package java2typescript.jackson.module;
 
 import java.util.Collection;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.SimpleType;
-
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.grammar.TypeDeclarationType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
@@ -40,7 +38,7 @@ public class DefinitionGenerator {
 	}
 
 	/**
-	 * @param module
+	 * @param moduleName
 	 *            Module to be filled with named types (classes, enums, ...)
 	 * @param classes
 	 *            Class for which generating definition
@@ -53,9 +51,11 @@ public class DefinitionGenerator {
 		}
 
 		Module module = new Module(moduleName);
-		TSJsonFormatVisitorWrapper visitor = new TSJsonFormatVisitorWrapper(module, conf);
+		module.addClassesToParse(classes);
 
-		for (Class<?> clazz : classes) {
+		TSJsonFormatVisitorWrapper visitor = new TSJsonFormatVisitorWrapper(module, conf);
+		Class<?> clazz;
+		while ((clazz = module.pollNextClassToParse()) != null) {
 			AbstractType customType = conf.getCustomTypes().get(clazz.getName());
 			if(customType != null && customType instanceof TypeDeclarationType) {
 				// When the class is registered as TypeDeclarationType, then ...
