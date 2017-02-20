@@ -17,7 +17,6 @@
 package java2typescript.jackson.module;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Date;
 
 import java2typescript.jackson.module.grammar.Module;
@@ -65,14 +64,8 @@ public class CustomTypeDefinitionGeneratorTest {
 		// Arrange
 		Configuration conf = new Configuration().addType(CustomDate.class, DateType.getInstance());
 		Module module = TestUtil.createTestModule(conf, TestClass.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 	@Test
@@ -83,14 +76,8 @@ public class CustomTypeDefinitionGeneratorTest {
 				.addType(LongValueAddedDirectlyToModule.class, new TypeDeclarationType("NumericValue", "number"))
 				.addType(Unused.class, new TypeDeclarationType("Unused", "shouldNotBeEmitted"));
 		Module module = TestUtil.createTestModule(conf, TestClass.class, LongValueAddedDirectlyToModule.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 

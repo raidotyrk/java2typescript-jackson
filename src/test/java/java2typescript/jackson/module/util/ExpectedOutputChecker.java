@@ -13,13 +13,29 @@ import java.util.stream.Collectors;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
+import java2typescript.jackson.module.grammar.Module;
+import java2typescript.jackson.module.writer.ModuleWriter;
 import org.junit.Assert;
 
 public class ExpectedOutputChecker {
 
-	public static void checkOutputFromFile(StringWriter out) {
-		StackTraceElement caller = getCaller();
-		printBanner(out.toString());
+	public static void writeAndCheckOutputFromFile(Module module, ModuleWriter moduleFormatWriter) throws IOException {
+		StringWriter out = new StringWriter();
+
+		// Act
+		try {
+			moduleFormatWriter.write(module, out);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		out.close();
+
+		// Assert
+		ExpectedOutputChecker.checkOutputFromFile(out, getCaller());
+	}
+
+	public static void checkOutputFromFile(StringWriter out, StackTraceElement caller) {
+		System.out.println(out);
 		compareFileContent(out, caller);
 	}
 

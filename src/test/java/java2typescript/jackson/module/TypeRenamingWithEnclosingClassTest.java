@@ -1,7 +1,6 @@
 package java2typescript.jackson.module;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java2typescript.jackson.module.conf.typename.WithEnclosingClassTSTypeNamingStrategy;
@@ -30,14 +29,8 @@ public class TypeRenamingWithEnclosingClassTest {
 		Configuration conf = new Configuration();
 		conf.setNamingStrategy(new WithEnclosingClassTSTypeNamingStrategy());
 		Module module = TestUtil.createTestModule(conf, TestClass.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 }

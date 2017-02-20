@@ -18,7 +18,6 @@ package java2typescript.jackson.module;
 
 import java.beans.Transient;
 import java.io.IOException;
-import java.io.StringWriter;
 
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.util.ExpectedOutputChecker;
@@ -79,13 +78,7 @@ public class ExcludedMethodsTest {
 		conf.addIngoredMethod("blacklistedMethod");
 		conf.addIngoredMethod("blacklistedStaticMethod");
 		Module module = TestUtil.createTestModule(conf, TestClass.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 }

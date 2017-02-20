@@ -1,7 +1,6 @@
 package java2typescript.jackson.module;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.util.ExpectedOutputChecker;
@@ -18,14 +17,8 @@ public class ClassWithoutFieldsTest {
 	public void classWithoutFields() throws IOException {
 		// Arrange
 		Module module = TestUtil.createTestModule(null, ClassWithoutFields.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 	@Test
@@ -37,14 +30,8 @@ public class ClassWithoutFieldsTest {
 			public Object javaLangObject;
 		}
 		Module module = TestUtil.createTestModule(null, RererencesClassWithoutFields.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 	@Test
@@ -56,13 +43,7 @@ public class ClassWithoutFieldsTest {
 			}
 		}
 		Module module = TestUtil.createTestModule(null, ClassWithOnlyMethod.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 }

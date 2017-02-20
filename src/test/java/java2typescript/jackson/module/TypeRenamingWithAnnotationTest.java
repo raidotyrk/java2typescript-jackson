@@ -1,7 +1,6 @@
 package java2typescript.jackson.module;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java2typescript.jackson.module.grammar.Module;
@@ -26,13 +25,7 @@ public class TypeRenamingWithAnnotationTest {
 	public void nameChangedWithAnnotation() throws IOException {
 		// Arrange
 		Module module = TestUtil.createTestModule(null, EnumToRename.class, ClassToRename.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 }

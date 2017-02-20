@@ -64,24 +64,18 @@ public class DefinitionGeneratorTest {
 
 		// Act
 		module.write(out); // for backwards compatibility the same as `new InternalModuleFormatWriter().write(module, out);`
-		out.close();
 
 		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.checkOutputFromFile(out, new Throwable().getStackTrace()[0]);
 	}
+
 
 	@Test
 	public void externalModuleFormat() throws IOException {
 		// Arrange
 		Module module = createTestModule();
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 	class RecursiveTestClass {
@@ -97,28 +91,16 @@ public class DefinitionGeneratorTest {
 	public void classWithMethodReturningThis() throws IOException {
 		// Arrange
 		Module module = TestUtil.createTestModule(null, RecursiveTestClass.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 	@Test
 	public void ambientModuleFormat() throws IOException {
 		// Arrange
 		Module module = createTestModule();
-		StringWriter out = new StringWriter();
 
-		// Act
-		new AmbientModuleFormatWriter().write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new AmbientModuleFormatWriter());
 	}
 
 	private Module createTestModule() throws JsonMappingException {

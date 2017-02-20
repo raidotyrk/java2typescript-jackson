@@ -54,14 +54,8 @@ public class WriterPreferencesTest {
 		mWriter.preferences.useEnumPattern();
 
 		Module module = TestUtil.createTestModule(null, Enum.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		mWriter.write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, mWriter);
 	}
 
 	@Test
@@ -71,14 +65,8 @@ public class WriterPreferencesTest {
 		mWriter.preferences.useStringLiteralTypeForEnums();
 
 		Module module = TestUtil.createTestModule(null, Enum.class, EnumOneValue.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		mWriter.write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, mWriter);
 	}
 
 	@Test
@@ -88,14 +76,8 @@ public class WriterPreferencesTest {
 		mWriter.preferences.useStringLiteralTypeForEnums(true);
 
 		Module module = TestUtil.createTestModule(null, Enum.class, EnumOneValue.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		mWriter.write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, mWriter);
 	}
 
 	@Test
@@ -105,14 +87,8 @@ public class WriterPreferencesTest {
 		mWriter.preferences.useEnumPattern(); // should be ignored when no enums found
 
 		Module module = TestUtil.createTestModule(null, Dummy.class);
-		StringWriter out = new StringWriter();
 
-		// Act
-		mWriter.write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, mWriter);
 	}
 
 	@Test
@@ -127,14 +103,8 @@ public class WriterPreferencesTest {
 		List<Class<?>> toConvert = new ArrayList<Class<?>>();
 		toConvert.add(Constants.class);
 		new StaticFieldExporter(module, conf).export(toConvert);
-		StringWriter out = new StringWriter();
 
-		// Act
-		writer.write(module, out);
-		out.close();
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, writer);
 	}
 
 	@Test
