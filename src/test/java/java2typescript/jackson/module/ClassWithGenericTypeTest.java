@@ -51,15 +51,8 @@ public class ClassWithGenericTypeTest {
 		// Arrange
 		Configuration conf = new Configuration();
 		Module module = TestUtil.createTestModule(conf, ClassWithGenericTypeParams.class);
-		Writer out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-		System.out.println(out);
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 }
