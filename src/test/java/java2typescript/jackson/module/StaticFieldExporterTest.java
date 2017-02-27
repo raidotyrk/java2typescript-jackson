@@ -15,19 +15,14 @@
  ******************************************************************************/
 package java2typescript.jackson.module;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 
-import java2typescript.jackson.module.grammar.Module;
-
-import org.junit.Test;
-
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java2typescript.jackson.module.grammar.Module;
+import java2typescript.jackson.module.util.ExpectedOutputChecker;
+import java2typescript.jackson.module.writer.InternalModuleFormatWriter;
+import org.junit.Test;
 
 public class StaticFieldExporterTest {
 	@JsonTypeName("ChangedEnumName")
@@ -62,25 +57,13 @@ public class StaticFieldExporterTest {
 	}
 
 	@Test
-	public void testTypeScriptDefinition() throws IOException, IllegalArgumentException {
-		Writer out = new StringWriter();
-
+	public void testExportingConstants() throws IOException, IllegalArgumentException {
 		ArrayList<Class<?>> classesToConvert = new ArrayList<Class<?>>();
 		classesToConvert.add(TestClass.class);
 
 		Module module = new Module("mod");
 		new StaticFieldExporter(module, null).export(classesToConvert);
 
-		module.write(out);
-
-		out.close();
-		final String result = out.toString();
-		System.out.println(result);
-		assertTrue(result.contains("export class TestClassStatic"));
-		assertTrue(result.contains("export enum ChangedEnumName"));
-		assertTrue(result.contains("static MY_CONSTANT_STRING: string = 'Test';"));
-		assertTrue(result
-				.contains("static MY_CONSTANT_ENUM_ARRAY_2: ChangedEnumName[] = [ ChangedEnumName.VAL1, ChangedEnumName.VAL2 ];"));
-		assertFalse(result.contains("doNotExportAsStatic"));
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new InternalModuleFormatWriter());
 	}
 }
