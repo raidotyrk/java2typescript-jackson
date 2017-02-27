@@ -41,6 +41,7 @@ public class TypeUtil {
 	private static boolean isTypeScriptTypeNumber(Class<?> clazz) {
 		return Number.class.isAssignableFrom(clazz)
 				|| clazz == double.class
+				|| clazz == float.class
 				|| clazz == int.class
 				|| clazz == long.class;
 	}
