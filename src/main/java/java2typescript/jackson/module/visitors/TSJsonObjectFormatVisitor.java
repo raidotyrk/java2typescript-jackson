@@ -46,7 +46,6 @@ import com.google.common.collect.Lists;
 import java2typescript.jackson.module.Configuration;
 import java2typescript.jackson.module.TypeUtil;
 import java2typescript.jackson.module.grammar.*;
-import java2typescript.jackson.module.grammar.base.AbstractNamedType;
 import java2typescript.jackson.module.grammar.base.AbstractPrimitiveType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
 
@@ -64,7 +63,7 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 	private GenericTypes getGenericTypes(Type[] genericTypes) {
 		GenericTypes generics = new GenericTypes();
 		for (Type type : genericTypes) {
-			generics.addGenericType(new GenericType(type.getTypeName()));
+			generics.addGenericType(new GenericType((TypeVariable) type));
 		}
 		return generics;
 	}
@@ -72,16 +71,22 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 	private GenericTypes getGenericTypesWithTSNames(Type[] genericTypes) {
 		GenericTypes generics = new GenericTypes();
 		for (Type type : genericTypes) {
-			if(type instanceof TypeVariable) {
-				TypeVariable typeVariable = (TypeVariable) type;
-				generics.addGenericType(new GenericType(typeVariable.getTypeName()));
-				continue;
-			}
-			Class<?> typeClass = TypeUtil.getClass(type);
-			String rawTsTypeName = getTypeScriptTypeName(typeClass);
-			generics.addGenericType(new GenericType(rawTsTypeName));
+			GenericType tsGeneric = getTypeScriptGenericTypeFromJavaType(type);
+			generics.addGenericType(tsGeneric);
 		}
 		return generics;
+	}
+
+	private GenericType getTypeScriptGenericTypeFromJavaType(Type type) {
+		AbstractType tsType;
+		if(type instanceof TypeVariable) {
+			TypeVariable typeVariable = (TypeVariable) type;
+			GenericType tsGeneric = new GenericType(typeVariable);
+			return tsGeneric;
+		}
+		Class<?> typeClass = TypeUtil.getClass(type);
+		tsType = getTypeScriptTypeFromJavaClass(typeClass);
+		return new GenericType(tsType);
 	}
 
 	private void addField(String name, AbstractType fieldType) {
@@ -234,8 +239,7 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 
 	private AbstractType getTsTypeForGenericType(JavaType type, Type genericType) {
 		if (genericType instanceof TypeVariable) {
-			String genericTypeName = genericType.getTypeName();
-			return new GenericType(genericTypeName);
+			return new GenericType((TypeVariable) genericType);
 		}
 		if (genericType instanceof ParameterizedType) {
 			AbstractType tsType = getTypeScriptTypeFromJavaClass(type.getRawClass());
@@ -264,17 +268,6 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 		// as otherwise generic type parameters would be replaced with types declared by the first class that uses the typeWithGenerics
 		// which would usually be incorrect for other classes
 		getModule().addClassesToParse(Lists.newArrayList(rawClass));
-	}
-
-	private String getTypeScriptTypeName(Class<?> rawClass) {
-		AbstractType tsType = TypeUtil.getTypeScriptTypeFromJavaClass(rawClass, getModule(), conf.getNamingStrategy());
-		if (tsType instanceof AbstractNamedType) {
-			return ((AbstractNamedType) tsType).getName();
-		} else if (tsType instanceof AbstractPrimitiveType) {
-			return ((AbstractPrimitiveType) tsType).getToken();
-		} else {
-			throw new RuntimeException("TODO");
-		}
 	}
 
 	private Type getGenericType(BeanProperty writer) {
