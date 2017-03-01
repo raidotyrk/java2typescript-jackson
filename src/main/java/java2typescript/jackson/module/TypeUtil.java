@@ -1,6 +1,7 @@
 package java2typescript.jackson.module;
 
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -33,7 +34,11 @@ public class TypeUtil {
 		} else if (Map.class.isAssignableFrom(clazz)) {
 			throw new RuntimeException("TODO implementation for Map " + clazz);
 		} else if (Collection.class.isAssignableFrom(clazz)) {
-			throw new RuntimeException("TODO implementation for Collection " + clazz);
+			TypeVariable<? extends Class<?>> typeParameter = clazz.getTypeParameters()[0];
+			// Note, generic type name is based on generic type of the class (such as `List<E>`),
+			// not based on generic type of the field (such as `List<T>`, where T could come from generic of the class)
+			GenericType genericType = new GenericType(typeParameter);
+			return new ArrayType(genericType);
 		}
 		return new ClassType(namingStrategy.getName(getJavaTypeFromClass(clazz)));
 	}

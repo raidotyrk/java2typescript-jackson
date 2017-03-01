@@ -56,6 +56,14 @@ public class ClassWithGenericTypeTest {
 		public Map<String, Boolean> booleansByStrings;
 	}
 
+	static class ClassWithGenericFieldWhereClassHasGenericCollection {
+		public ClassHasGenericCollection<String> genericClassOfStrings;
+	}
+
+	class ClassHasGenericCollection<T> {
+		public List<T> genericList;
+	}
+
 	@Test
 	public void classWithCollections() throws IOException {
 		// Arrange
@@ -103,6 +111,14 @@ public class ClassWithGenericTypeTest {
 		// Arrange
 		Configuration conf = new Configuration();
 		Module module = TestUtil.createTestModule(conf, ClassWithGenericTypeParams.class);
+
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
+	}
+
+	@Test
+	public void classWithGenericFieldWhereClassHasGenericCollection() throws Exception {
+		// Arrange
+		Module module = TestUtil.createTestModule(null, ClassWithGenericFieldWhereClassHasGenericCollection.class);
 
 		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
