@@ -55,15 +55,22 @@ public class ExpectedOutputChecker {
 					getLinesAlphabeticallyWithoutComments(out.toString()));
 		} catch (AssertionError e) {
 			String testMethod = testMethodStackTraceElem.getClassName() + "." + testMethodStackTraceElem.getMethodName();
-			printBanner("Expected output of " + testMethod, expectedOutput);
+			String expectedOutputWithoutComments = getLinesWithoutComments(expectedOutput).stream()
+					.collect(Collectors.joining("\n"));
+			printBanner("Expected output of " + testMethod, expectedOutputWithoutComments);
 			throw e;
 		}
 	}
 
 	private static List<String> getLinesAlphabeticallyWithoutComments(String s) {
+		List<String> lines = getLinesWithoutComments(s);
+		Collections.sort(lines);
+		return lines;
+	}
+
+	private static List<String> getLinesWithoutComments(String s) {
 		List<String> lines = Lists.newArrayList(s.split("\\n"));
 		lines = removeCommentLines(lines);
-		Collections.sort(lines);
 		return lines;
 	}
 
