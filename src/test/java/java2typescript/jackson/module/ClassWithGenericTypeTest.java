@@ -46,6 +46,9 @@ public class ClassWithGenericTypeTest {
 	public class BooleanClass extends GenericClass<Boolean> {
 	}
 
+	public class ClassWithNonPrimitiveGeneric extends ValueClass<BooleanClass> {
+	}
+
 	static class ClassWithGenericTypeParams<K, V> {
 		public String stringField;
 		public K genericFieldK;
@@ -83,6 +86,14 @@ public class ClassWithGenericTypeTest {
 	public void classExtendsClassWithGenericTypeParams() throws IOException {
 		// Arrange
 		Module module = TestUtil.createTestModule(null, StringClass.class, BooleanClass.class, AtomicIntegerClass.class);
+
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
+	}
+
+	@Test
+	public void classExtendsClassWithNonPrimitiveGenericTypeParams() throws IOException {
+		// Arrange
+		Module module = TestUtil.createTestModule(null, ClassWithNonPrimitiveGeneric.class);
 
 		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}

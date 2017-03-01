@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeBindings;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.collect.Lists;
+import java2typescript.jackson.module.ClassMemberUtil;
 import java2typescript.jackson.module.Configuration;
 import java2typescript.jackson.module.TypeUtil;
 import java2typescript.jackson.module.grammar.*;
@@ -213,7 +214,7 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 				}
 				Type genericType = getGenericType(writer);
 				if (genericType != null) {
-					AbstractType tsTypeWithResolvedGenerics = resolveTSTypeIfNeeded(type, genericType);
+					AbstractType tsTypeWithResolvedGenerics = resolveTSTypeIfNeeded(writer, type, genericType);
 					if(tsTypeWithResolvedGenerics != null) {
 						return tsTypeWithResolvedGenerics;
 					}
@@ -230,11 +231,19 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 
 	}
 
-	private AbstractType resolveTSTypeIfNeeded(JavaType type, Type genericType) {
+	private AbstractType resolveTSTypeIfNeeded(BeanProperty writer, JavaType type, Type genericType) {
 		if (!isSupportedWithoutGenerics(type)) {
-			return getTsTypeForGenericType(type, genericType);
+			boolean resolveGenericType = !(genericType instanceof TypeVariable) || isDeclaredInSameClass(writer);
+			if (resolveGenericType) {
+				return getTsTypeForGenericType(type, genericType);
+			}
 		}
 		return null;
+	}
+
+	private boolean isDeclaredInSameClass(BeanProperty writer) {
+		Class<?> declaringClassOfProperty = ClassMemberUtil.getDeclaringClass(clazz, writer.getName());
+		return clazz.equals(declaringClassOfProperty);
 	}
 
 	private boolean isSupportedWithoutGenerics(JavaType jacksonType) {
