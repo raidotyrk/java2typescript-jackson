@@ -213,8 +213,9 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 				}
 				Type genericType = getGenericType(writer);
 				if (genericType != null) {
-					if (!isSupportedWithoutGenerics(type)) {
-						return getTsTypeForGenericType(type, genericType);
+					AbstractType tsTypeWithResolvedGenerics = resolveTSTypeIfNeeded(type, genericType);
+					if(tsTypeWithResolvedGenerics != null) {
+						return tsTypeWithResolvedGenerics;
 					}
 				}
 				return getTSTypeForHandler(this, ser, type, conf);
@@ -227,6 +228,13 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 					"Error when serializing %s, you should add a custom mapping for it", type.getRawClass()), e);
 		}
 
+	}
+
+	private AbstractType resolveTSTypeIfNeeded(JavaType type, Type genericType) {
+		if (!isSupportedWithoutGenerics(type)) {
+			return getTsTypeForGenericType(type, genericType);
+		}
+		return null;
 	}
 
 	private boolean isSupportedWithoutGenerics(JavaType jacksonType) {
