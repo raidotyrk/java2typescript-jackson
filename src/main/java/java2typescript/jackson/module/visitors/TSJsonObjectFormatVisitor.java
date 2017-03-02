@@ -257,6 +257,22 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 				}
 			}
 		}
+		if (type instanceof MapType
+				&& genericType instanceof ParameterizedType
+				&& isDeclaredInSameClass(writer)) {
+			ParameterizedType parameterizedType = (ParameterizedType) genericType;
+			Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+			Type keyTypeFromProperty = actualTypeArguments[0];
+			Type valueTypeFromProperty = actualTypeArguments[1];
+			if (keyTypeFromProperty instanceof TypeVariable || valueTypeFromProperty instanceof TypeVariable) {
+				GenericType tsMapKeyType = getTypeScriptGenericTypeFromJavaType(keyTypeFromProperty);
+				GenericType tsMapValueType = getTypeScriptGenericTypeFromJavaType(valueTypeFromProperty);
+				java2typescript.jackson.module.grammar.MapType tsType = new java2typescript.jackson.module.grammar.MapType();
+				tsType.setKeyType(tsMapKeyType);
+				tsType.setValueType(tsMapValueType);
+				return tsType;
+			}
+		}
 		return null;
 	}
 

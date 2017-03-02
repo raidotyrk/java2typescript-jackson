@@ -5,6 +5,7 @@ export interface ClassWithGenericFieldWhereClassHasGenericCollection {
 
 export interface ClassHasGenericCollection<T> {
     genericList: T[];
+    genericMap: { [key: string ]: T;};
 }
 
 export interface BooleanClass {

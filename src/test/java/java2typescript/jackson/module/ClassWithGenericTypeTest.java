@@ -63,6 +63,7 @@ public class ClassWithGenericTypeTest {
 
 	class ClassHasGenericCollection<T> {
 		public List<T> genericList;
+		public Map<String, T> genericMap;
 	}
 
 	@Test
