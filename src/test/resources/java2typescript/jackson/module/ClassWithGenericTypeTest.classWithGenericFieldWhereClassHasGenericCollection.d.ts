@@ -6,6 +6,9 @@ export interface ClassWithGenericFieldWhereClassHasGenericCollection {
 export interface ClassHasGenericCollection<T> {
     genericList: T[];
     genericMap: { [key: string ]: T;};
+    genericValueClassField: ValueClass<T>;
+    stringValueClassField: ValueClass<string>;
+    nonPrimitiveValueClassField: ValueClass<BooleanClass>;
 }
 
 export interface BooleanClass {
@@ -13,3 +16,6 @@ export interface BooleanClass {
     genericList: boolean[];
 }
 
+export interface ValueClass<T> {
+    genericValue: T;
+}
