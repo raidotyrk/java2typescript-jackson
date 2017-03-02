@@ -17,8 +17,7 @@ package java2typescript.jackson.module.grammar;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import java2typescript.jackson.module.grammar.base.AbstractNamedType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
@@ -31,6 +30,8 @@ public class Module {
 	private Map<String, AbstractNamedType> namedTypes = new HashMap<String, AbstractNamedType>();
 
 	private Map<String, AbstractType> vars = new HashMap<String, AbstractType>();
+
+	private Deque<Class<?>> classesToParse = new LinkedList<>();
 
 	public Module() {
 	}
@@ -57,6 +58,14 @@ public class Module {
 
 	public void write(Writer writer) throws IOException {
 		new InternalModuleFormatWriter().write(this, writer);
+	}
+
+	public void addClassesToParse(Collection<? extends Class<?>> classes) {
+		this.classesToParse.addAll(classes);
+	}
+
+	public Class<?> pollNextClassToParse() {
+		return this.classesToParse.poll();
 	}
 
 }

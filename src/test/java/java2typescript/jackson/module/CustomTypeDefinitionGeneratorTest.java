@@ -17,11 +17,7 @@
 package java2typescript.jackson.module;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Date;
-
-import org.junit.Test;
 
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.grammar.TypeDeclarationType;
@@ -29,6 +25,7 @@ import java2typescript.jackson.module.grammar.base.AbstractPrimitiveType;
 import java2typescript.jackson.module.util.ExpectedOutputChecker;
 import java2typescript.jackson.module.util.TestUtil;
 import java2typescript.jackson.module.writer.ExternalModuleFormatWriter;
+import org.junit.Test;
 
 public class CustomTypeDefinitionGeneratorTest {
 
@@ -67,15 +64,8 @@ public class CustomTypeDefinitionGeneratorTest {
 		// Arrange
 		Configuration conf = new Configuration().addType(CustomDate.class, DateType.getInstance());
 		Module module = TestUtil.createTestModule(conf, TestClass.class);
-		Writer out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-		System.out.println(out);
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 	@Test
@@ -86,15 +76,8 @@ public class CustomTypeDefinitionGeneratorTest {
 				.addType(LongValueAddedDirectlyToModule.class, new TypeDeclarationType("NumericValue", "number"))
 				.addType(Unused.class, new TypeDeclarationType("Unused", "shouldNotBeEmitted"));
 		Module module = TestUtil.createTestModule(conf, TestClass.class, LongValueAddedDirectlyToModule.class);
-		Writer out = new StringWriter();
 
-		// Act
-		new ExternalModuleFormatWriter().write(module, out);
-		out.close();
-		System.out.println(out);
-
-		// Assert
-		ExpectedOutputChecker.checkOutputFromFile(out);
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 

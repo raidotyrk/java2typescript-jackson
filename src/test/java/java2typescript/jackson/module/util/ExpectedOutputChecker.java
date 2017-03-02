@@ -1,6 +1,7 @@
 package java2typescript.jackson.module.util;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.Collections;
@@ -12,12 +13,30 @@ import java.util.stream.Collectors;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
+import java2typescript.jackson.module.grammar.Module;
+import java2typescript.jackson.module.writer.ModuleWriter;
 import org.junit.Assert;
 
 public class ExpectedOutputChecker {
 
-	public static void checkOutputFromFile(Writer out) {
-		compareFileContent(out, getCaller());
+	public static void writeAndCheckOutputFromFile(Module module, ModuleWriter moduleFormatWriter) {
+		StringWriter out = new StringWriter();
+
+		// Act
+		try {
+			moduleFormatWriter.write(module, out);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		// Assert
+		ExpectedOutputChecker.checkOutputFromFile(out, getCaller());
+	}
+
+	public static void checkOutputFromFile(StringWriter out, StackTraceElement caller) {
+		String testMethod = caller.getClassName() + "." + caller.getMethodName();
+		printBanner("Output generated from " + testMethod, out.toString());
+		compareFileContent(out, caller);
 	}
 
 	public static void checkOutputFromFileEquals(Writer out) {
@@ -26,11 +45,19 @@ public class ExpectedOutputChecker {
 	private static StackTraceElement getCaller() {
 		return new Throwable().getStackTrace()[2];
 	}
+
 	private static void compareFileContent(Writer out, StackTraceElement testMethodStackTraceElem) {
+		String expectedOutput = getExpectedOutput(testMethodStackTraceElem);
 		// Can't rely on specific order of classes/fields/methods, so file content equality can't be used.
 		// Using naive approach to check that actual output contains exactly the same lines as expected output
-		Assert.assertEquals(getLinesAlphabeticallyWithoutComments(getExpectedOutput(testMethodStackTraceElem)),
-				getLinesAlphabeticallyWithoutComments(out.toString()));
+		try {
+			Assert.assertEquals(getLinesAlphabeticallyWithoutComments(expectedOutput),
+					getLinesAlphabeticallyWithoutComments(out.toString()));
+		} catch (AssertionError e) {
+			String testMethod = testMethodStackTraceElem.getClassName() + "." + testMethodStackTraceElem.getMethodName();
+			printBanner("Expected output of " + testMethod, expectedOutput);
+			throw e;
+		}
 	}
 
 	private static List<String> getLinesAlphabeticallyWithoutComments(String s) {
@@ -81,6 +108,16 @@ public class ExpectedOutputChecker {
 				})
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
+	}
+
+	private static void printBanner(String bannerTitle, String bannerBody) {
+		System.out.println("---------------------------------------------------------------------------------------------");
+		System.out.println("START: " + bannerTitle);
+		System.out.println("---------------------------------------------------------------------------------------------");
+		System.out.println(bannerBody);
+		System.out.println("---------------------------------------------------------------------------------------------");
+		System.out.println("END: " + bannerTitle);
+		System.out.println("---------------------------------------------------------------------------------------------");
 	}
 
 }
