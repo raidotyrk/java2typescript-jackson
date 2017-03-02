@@ -87,6 +87,13 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 		}
 		Class<?> typeClass = TypeUtil.getClass(type);
 		tsType = getTypeScriptTypeFromJavaClass(typeClass);
+		if(tsType instanceof AbstractPrimitiveType) {
+			// no need to add primitive TypeScript types to module
+		} else if(tsType instanceof ClassType) {
+			addGenericTypeToModule(typeClass);
+		} else {
+			throw new RuntimeException("TODO: should " + typeClass + " be added to generated output?");
+		}
 		return new GenericType(tsType);
 	}
 

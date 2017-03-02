@@ -58,6 +58,7 @@ public class ClassWithGenericTypeTest {
 
 	static class ClassWithGenericFieldWhereClassHasGenericCollection {
 		public ClassHasGenericCollection<String> genericClassOfStrings;
+		public ClassHasGenericCollection<BooleanClass> genericClassOfNonPrimitiveGeneric;
 	}
 
 	class ClassHasGenericCollection<T> {
