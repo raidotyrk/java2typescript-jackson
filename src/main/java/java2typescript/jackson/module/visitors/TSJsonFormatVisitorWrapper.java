@@ -23,6 +23,7 @@ import java2typescript.jackson.module.TypeUtil;
 import java2typescript.jackson.module.grammar.EnumType;
 import java2typescript.jackson.module.grammar.Module;
 import java2typescript.jackson.module.grammar.base.AbstractNamedType;
+import java2typescript.jackson.module.grammar.base.AbstractPrimitiveType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
 
 public class TSJsonFormatVisitorWrapper extends ABaseTSJsonFormatVisitor implements
@@ -62,7 +63,12 @@ public class TSJsonFormatVisitorWrapper extends ABaseTSJsonFormatVisitor impleme
 	}
 
 	private TSJsonObjectFormatVisitor useNamedClassOrParse(JavaType javaType) {
-
+		AbstractType tsType = TypeUtil.getTypeScriptTypeFromJavaClass(
+				javaType.getRawClass(), getModule(), conf.getNamingStrategy());
+		if(tsType instanceof AbstractPrimitiveType) {
+			type = tsType;
+			return null;
+		}
 		String name = getName(javaType);
 
 		AbstractNamedType namedType = getModule().getNamedTypes().get(name);

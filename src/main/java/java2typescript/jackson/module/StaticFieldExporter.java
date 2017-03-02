@@ -90,7 +90,13 @@ public class StaticFieldExporter {
 			return new Value(tsType, rawValue);
 		} else if (type == int.class) {
 			return new Value(tsType, rawValue);
+		} else if (type == long.class) {
+			return new Value(tsType, rawValue);
+		} else if (type == float.class) {
+			return new Value(tsType, rawValue);
 		} else if (type == double.class) {
+			return new Value(tsType, rawValue);
+		} else if (Number.class.isAssignableFrom(type)) {
 			return new Value(tsType, rawValue);
 		} else if (type == String.class) {
 			return new Value(tsType, "'" + (String) rawValue + "'");
@@ -111,6 +117,18 @@ public class StaticFieldExporter {
 				array = new Integer[tmpArray.length];
 				for (int i = 0; i < array.length; i++) {
 					array[i] = Integer.valueOf(tmpArray[i]);
+				}
+			} else if (componentType == long.class) {
+				long[] tmpArray = (long[]) rawValue;
+				array = new Long[tmpArray.length];
+				for (int i = 0; i < array.length; i++) {
+					array[i] = Long.valueOf(tmpArray[i]);
+				}
+			} else if (componentType == float.class) {
+				float[] tmpArray = (float[]) rawValue;
+				array = new Float[tmpArray.length];
+				for (int i = 0; i < array.length; i++) {
+					array[i] = Float.valueOf(tmpArray[i]);
 				}
 			} else if (componentType == double.class) {
 				double[] tmpArray = (double[]) rawValue;
