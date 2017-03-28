@@ -16,6 +16,15 @@ import org.junit.Test;
 
 public class ClassWithGenericTypeTest {
 
+	static class ClassWithMaps {
+		public Map<String, Boolean> mapStringToBoolean;
+		public Map<Integer, Boolean> mapIntegerToBoolean;
+		public Map<AtomicInteger, Boolean> mapAtomicIntegerToBoolean;
+		public Map<Long, Boolean> mapLongToBoolean;
+		public Map<Double, String> mapDoubleToString;
+		public Map<Integer, ClassWithMaps> mapIntegerToCustomType;
+	}
+
 	static class ClassWithCollections {
 		public List<String> stringList;
 		public Collection<Boolean> booleanCollection;
@@ -28,6 +37,7 @@ public class ClassWithGenericTypeTest {
 	static class ClassWithListOfStrings {
 		public List<String> stringList;
 	}
+
 	static class ClassWithMapOfBooleansByStrings {
 		public Map<String, Boolean> booleansByStrings;
 	}
@@ -67,6 +77,14 @@ public class ClassWithGenericTypeTest {
 		public ValueClass<T> genericValueClassField;
 		public ValueClass<String> stringValueClassField;
 		public ValueClass<BooleanClass> nonPrimitiveValueClassField;
+	}
+
+	@Test
+	public void classWithMaps() throws Exception {
+		// Arrange
+		Module module = TestUtil.createTestModule(null, ClassWithMaps.class);
+
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
 	}
 
 	@Test
