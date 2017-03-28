@@ -22,6 +22,7 @@ import java2typescript.jackson.module.Configuration;
 import java2typescript.jackson.module.TypeUtil;
 import java2typescript.jackson.module.grammar.EnumType;
 import java2typescript.jackson.module.grammar.Module;
+import java2typescript.jackson.module.grammar.NumberType;
 import java2typescript.jackson.module.grammar.base.AbstractNamedType;
 import java2typescript.jackson.module.grammar.base.AbstractPrimitiveType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
@@ -106,6 +107,10 @@ public class TSJsonFormatVisitorWrapper extends ABaseTSJsonFormatVisitor impleme
 			type = parseEnumOrGetFromCache(getModule(), jType);
 			return null;
 		} else {
+			if (Number.class.isAssignableFrom(jType.getRawClass())) {
+				type = NumberType.getInstance();
+				return null;
+			}
 			return setTypeAndReturn(new TSJsonStringFormatVisitor(this, conf));
 		}
 	}

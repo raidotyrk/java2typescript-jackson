@@ -44,7 +44,7 @@ public class DefinitionGeneratorTest {
 		public int _int;
 		public float _float;
 		public String[] stringArray;
-		public Map<Integer, Boolean> map;
+		public Map<String, Boolean> map;
 		public TestClass recursive;
 		public TestClass[] recursiveArray;
 		public ArrayList<String> stringArrayList;
@@ -68,7 +68,6 @@ public class DefinitionGeneratorTest {
 		// Assert
 		ExpectedOutputChecker.checkOutputFromFile(out, new Throwable().getStackTrace()[0]);
 	}
-
 
 	@Test
 	public void externalModuleFormat() throws IOException {
