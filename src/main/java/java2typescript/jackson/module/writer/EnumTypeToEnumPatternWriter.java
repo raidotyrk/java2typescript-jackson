@@ -5,7 +5,7 @@ import java.io.Writer;
 import java.util.List;
 
 import java2typescript.jackson.module.grammar.EnumType;
-import java2typescript.jackson.module.grammar.base.AbstractNamedType;
+import java2typescript.jackson.module.grammar.base.AbstractType;
 
 /**
  * Alternative to writing Java enum type to TypeScript enum type. Usefult, if You have following goals:<br>
@@ -17,12 +17,12 @@ import java2typescript.jackson.module.grammar.base.AbstractNamedType;
 public class EnumTypeToEnumPatternWriter implements CustomAbstractTypeWriter {
 
 	@Override
-	public boolean accepts(AbstractNamedType type, WriterPreferences preferences) {
+	public boolean accepts(AbstractType type, WriterPreferences preferences) {
 		return type instanceof EnumType;
 	}
 
 	@Override
-	public void writeDef(AbstractNamedType type, Writer writer, WriterPreferences preferences) throws IOException {
+	public void writeDef(AbstractType type, Writer writer, WriterPreferences preferences) throws IOException {
 		EnumType enumType = (EnumType) type;
 		String enumTypeName = enumType.getName();
 		writer.write(String.format("class %s extends EnumPatternBase {\n", enumTypeName));

@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import java2typescript.jackson.module.grammar.EnumType;
-import java2typescript.jackson.module.grammar.base.AbstractNamedType;
+import java2typescript.jackson.module.grammar.base.AbstractType;
 
 /**
  * Another alternate way of converting Java enums. This writer will convert enums to what is known as a String Literal
@@ -22,12 +22,12 @@ public class EnumTypeToStringLiteralTypeWriter implements CustomAbstractTypeWrit
 	private String enumConstantValuesClassSufix = "Values";
 
 	@Override
-	public boolean accepts(AbstractNamedType type, WriterPreferences preferences) {
+	public boolean accepts(AbstractType type, WriterPreferences preferences) {
 		return type instanceof EnumType;
 	}
 
 	@Override
-	public void writeDef(AbstractNamedType type, Writer writer, WriterPreferences preferences) throws IOException {
+	public void writeDef(AbstractType type, Writer writer, WriterPreferences preferences) throws IOException {
 		// metadata about the enum being converted
 		EnumType enumType = (EnumType) type;
 		String enumTypeName = enumType.getName();
