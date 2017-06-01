@@ -17,6 +17,7 @@ package java2typescript.jackson.module.grammar;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 
 import java2typescript.jackson.module.grammar.base.AbstractType;
@@ -28,6 +29,7 @@ public class FunctionType extends AbstractType {
 	private LinkedHashMap<String, AbstractType> parameters = new LinkedHashMap<String, AbstractType>();
 
 	private AbstractType resultType;
+	private Method originalJavaClassMethod;
 
 	/** By default, printed as lambda function type (with =>) */
 	@Override
@@ -56,4 +58,11 @@ public class FunctionType extends AbstractType {
 		this.resultType = resultType;
 	}
 
+	public void setOriginalJavaClassMethod(Method originalJavaClassMethod) {
+		this.originalJavaClassMethod = originalJavaClassMethod;
+	}
+
+	public Method getOriginalJavaClassMethod() {
+		return originalJavaClassMethod;
+	}
 }
