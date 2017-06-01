@@ -199,7 +199,7 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 		if(customType != null) {
 			if(customType instanceof TypeDeclarationType) {
 				TypeDeclarationType tdt = (TypeDeclarationType) customType;
-				getModule().addNamedType(tdt.getName(), tdt);
+				getModule().addNamedType(tdt.getName(), tdt, type.getRawClass());
 			}
 			return customType;
 		}
@@ -334,4 +334,7 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 		return ser;
 	}
 
+	public Class<?> getOriginalClass() {
+		return clazz;
+	}
 }

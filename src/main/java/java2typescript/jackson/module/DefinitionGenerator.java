@@ -61,7 +61,7 @@ public class DefinitionGenerator {
 				// When the class is registered as TypeDeclarationType, then ...
 				String tsTypeName = conf.getNamingStrategy().getName(SimpleType.construct(clazz));
 				// ... add that type to the module ...
-				module.addNamedType(tsTypeName, (TypeDeclarationType) customType);
+				module.addNamedType(tsTypeName, (TypeDeclarationType) customType, clazz);
 				// ... instead of inspecting class body
 				continue;
 			}

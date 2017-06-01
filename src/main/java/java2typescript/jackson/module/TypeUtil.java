@@ -63,7 +63,7 @@ public class TypeUtil {
 			for (Object val : javaType.getRawClass().getEnumConstants()) {
 				enumType.getValues().add(val.toString());
 			}
-			module.addNamedType(name, enumType);
+			module.addNamedType(name, enumType, javaType.getRawClass());
 			return enumType;
 		} else {
 			return (EnumType) namedType;

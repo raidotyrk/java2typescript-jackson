@@ -72,7 +72,7 @@ public class StaticFieldExporter {
 				}
 			}
 			if (staticClass.getStaticFields().size() > 0) {
-				module.addNamedType(staticClass.getName(), staticClass);
+				module.addNamedType(staticClass.getName(), staticClass, clazz);
 			}
 		}
 	}
