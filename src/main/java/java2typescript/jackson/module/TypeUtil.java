@@ -57,13 +57,13 @@ public class TypeUtil {
 			Module module,
 			TSTypeNamingStrategy namingStrategy) {
 		String name = namingStrategy.getName(javaType);
-		AbstractType namedType = module.getNamedTypes().get(name);
+		AbstractType namedType = module.getNamedType(name);
 		if (namedType == null) {
 			EnumType enumType = new EnumType(name);
 			for (Object val : javaType.getRawClass().getEnumConstants()) {
 				enumType.getValues().add(val.toString());
 			}
-			module.getNamedTypes().put(name, enumType);
+			module.addNamedType(name, enumType);
 			return enumType;
 		} else {
 			return (EnumType) namedType;

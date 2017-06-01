@@ -139,8 +139,8 @@ public class WriterPreferencesTest {
 		List<Class<?>> toConvert = new ArrayList<Class<?>>();
 		toConvert.add(Constants.class);
 
-		module.getVars().put("z", module.getNamedTypes().get(Z.class.getSimpleName()));
-		module.getVars().put("a", module.getNamedTypes().get(A.class.getSimpleName()));
+		module.getVars().put("z", module.getNamedType(Z.class.getSimpleName()));
+		module.getVars().put("a", module.getNamedType(A.class.getSimpleName()));
 
 		new StaticFieldExporter(module, conf).export(toConvert);
 		Writer out = new StringWriter();

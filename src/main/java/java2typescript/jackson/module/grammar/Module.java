@@ -44,6 +44,14 @@ public class Module {
 		return namedTypes;
 	}
 
+	public AbstractNamedType getNamedType(String typeName) {
+		return namedTypes.get(typeName);
+	}
+
+	public void addNamedType(String typeName, AbstractNamedType namedType) {
+		namedTypes.put(typeName, namedType);
+	}
+
 	public Map<String, AbstractType> getVars() {
 		return vars;
 	}
