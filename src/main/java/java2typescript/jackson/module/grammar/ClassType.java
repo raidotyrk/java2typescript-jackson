@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import java2typescript.jackson.module.grammar.base.AbstractNamedType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
+import java2typescript.jackson.module.writer.FunctionTypeWriter;
 import java2typescript.jackson.module.writer.SortUtil;
 import java2typescript.jackson.module.writer.WriterPreferences;
 
@@ -77,7 +78,13 @@ public class ClassType extends AbstractNamedType {
 		}
 		for (String methodName : methodsKeySet) {
 			writer.write(preferences.getIndentation() + methodName);
-			this.methods.get(methodName).writeNonLambda(writer);
+			FunctionType functionType = this.methods.get(methodName);
+			if (!preferences.hasCustomWriter(functionType)) {
+				functionType.writeNonLambda(writer);
+			} else {
+				FunctionTypeWriter functionTypeWriter = (FunctionTypeWriter) preferences.getCustomWriter(functionType);
+				functionTypeWriter.write(functionType, writer, false, preferences);
+			}
 			writer.write(";\n");
 		}
 		preferences.decreaseIndention();

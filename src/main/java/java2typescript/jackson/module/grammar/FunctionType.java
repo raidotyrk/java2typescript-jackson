@@ -18,10 +18,12 @@ package java2typescript.jackson.module.grammar;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
+
 import java2typescript.jackson.module.grammar.base.AbstractType;
+import java2typescript.jackson.module.writer.FunctionTypeWriter;
 
 public class FunctionType extends AbstractType {
+	private static final FunctionTypeWriter DEFAULT_WRITER = new FunctionTypeWriter();
 
 	private LinkedHashMap<String, AbstractType> parameters = new LinkedHashMap<String, AbstractType>();
 
@@ -39,19 +41,7 @@ public class FunctionType extends AbstractType {
 	}
 
 	private void write(Writer writer, boolean lambdaSyntax) throws IOException {
-		writer.write("(");
-		int i = 1;
-		for (Entry<String, AbstractType> entry : parameters.entrySet()) {
-			writer.write(entry.getKey());
-			writer.write(": ");
-			entry.getValue().write(writer);
-			if (i < parameters.size()) {
-				writer.write(", ");
-			}
-			i++;
-		}
-		writer.write(")" + (lambdaSyntax ? "=> " : ": "));
-		resultType.write(writer);
+		DEFAULT_WRITER.write(this, writer, lambdaSyntax, null);
 	}
 
 	public LinkedHashMap<String, AbstractType> getParameters() {
