@@ -77,13 +77,19 @@ public class ExpectedOutputChecker {
 	private static String getExpectedOutput(StackTraceElement testMethodStackTraceElem) {
 		String testMethodName = testMethodStackTraceElem.getMethodName();
 		String className = testMethodStackTraceElem.getClassName();
-		String expectedOutputFromFile = getFileContent(className.replace('.', '/') + "." + testMethodName + ".d.ts");
+		String expectedOutputFromFile = getFileContent(className.replace('.', '/') + "." + testMethodName);
 		expectedOutputFromFile = expectedOutputFromFile.replace("\r", "");
 		return expectedOutputFromFile;
 	}
 
-	private static String getFileContent(String resourceName) {
-		URL url = Resources.getResource(resourceName);
+	private static String getFileContent(String resourceNameWithoutExt) {
+		String resourceName = resourceNameWithoutExt + ".ts";
+		URL url;
+		try {
+			url = Resources.getResource(resourceName);
+		} catch (IllegalArgumentException e) {
+			url = Resources.getResource(resourceNameWithoutExt + ".d.ts");
+		}
 		try {
 			return Resources.toString(url, Charsets.UTF_8);
 		}
