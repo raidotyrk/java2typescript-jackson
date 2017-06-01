@@ -242,6 +242,7 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 				ArrayType tsType = (ArrayType) getTypeScriptTypeFromJavaClass(type.getRawClass());
 				ParameterizedType parameterizedType = (ParameterizedType) genericType;
 				Type actualTypeArgumentFromProperty = parameterizedType.getActualTypeArguments()[0];
+				// TODO `(isDeclaredInSameClass(writer) || someOtherCondition)`
 				if (actualTypeArgumentFromProperty instanceof TypeVariable && isDeclaredInSameClass(writer)) {
 					// swap generic item type List<E> (E from class) to List<T> (T from field)
 					tsType.setItemType(new GenericType((TypeVariable) actualTypeArgumentFromProperty));

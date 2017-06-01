@@ -162,5 +162,21 @@ public class ClassWithGenericTypeTest {
 		public T genericValue;
 	}
 
+	class Slice<S> {
+		public List<S> listFieldInSliceClass;
+	}
+
+	class Page<T> extends Slice<T> {
+		public List<T> listFieldInPageClass;
+	}
+
+	// FIXME
+	@Test
+	public void fieldWithGenericDeclaredInSuperclass() throws Exception {
+		// Arrange
+		Module module = TestUtil.createTestModule(null, Page.class);
+
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, new ExternalModuleFormatWriter());
+	}
 }
 
