@@ -17,6 +17,8 @@ public class WriterPreferences {
 	private boolean constantsForStringLiteralTypeEnums = false;
 	/** sort types and vars in output */
 	private boolean sort;
+	private List<Class<?>> providedTypes = new ArrayList<>();
+
 
 	public boolean isStringLiteralTypeForEnums() {
 		return enumAsStringLiteralType;
@@ -76,6 +78,17 @@ public class WriterPreferences {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Can be used to exclude given types from generated output
+	 */
+	public void setProvidedTypes(List<Class<?>> providedTypes) {
+		this.providedTypes = providedTypes;
+	}
+
+	public List<Class<?>> getProvidedTypes() {
+		return providedTypes;
 	}
 
 	public String getIndentation() {

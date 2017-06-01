@@ -37,7 +37,7 @@ public class ProvidedClassesTest {
 		Configuration conf = new Configuration();
 		Module module = TestUtil.createTestModule(conf, ClassWithFieldsOfProvidedTypes.class);
 		ExternalModuleFormatWriter moduleWriter = new ExternalModuleFormatWriter();
-		moduleWriter.setProvidedTypes(providedClasses);
+		moduleWriter.preferences.setProvidedTypes(providedClasses);
 		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, moduleWriter);
 	}
 
