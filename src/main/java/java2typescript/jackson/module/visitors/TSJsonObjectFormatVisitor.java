@@ -27,20 +27,13 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
-import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
-import com.fasterxml.jackson.databind.introspect.AnnotationMap;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.introspect.*;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
-import com.fasterxml.jackson.databind.type.TypeBindings;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.collect.Lists;
 import java2typescript.jackson.module.ClassMemberUtil;
@@ -141,10 +134,8 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 	}
 
 	private AbstractType getTSTypeForClass(AnnotatedMember member) {
-
-		TypeBindings bindings = new TypeBindings(TypeFactory.defaultInstance(), member.getDeclaringClass());
-		BeanProperty prop = new BeanProperty.Std(member.getName(), member.getType(bindings), NO_NAME,
-				new AnnotationMap(), member, false);
+		BeanProperty prop = new BeanProperty.Std(new PropertyName(member.getName()), member.getType(), NO_NAME,
+				new AnnotationMap(), member, PropertyMetadata.STD_OPTIONAL);
 
 		try {
 			return getTSTypeForProperty(prop);
@@ -156,7 +147,8 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 	private void addMethod(Method method) {
 		FunctionType function = new FunctionType();
 
-		AnnotatedMethod annotMethod = new AnnotatedMethod(null, method, new AnnotationMap(), null);
+		TypeResolutionContext.Basic basicCtxt = new TypeResolutionContext.Basic(TypeFactory.defaultInstance(), null);
+		AnnotatedMethod annotMethod = new AnnotatedMethod(basicCtxt, method, new AnnotationMap(), null);
 
 		function.setResultType(getTSTypeForClass(annotMethod));
 		for (int i = 0; i < annotMethod.getParameterCount(); i++) {

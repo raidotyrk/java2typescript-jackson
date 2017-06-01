@@ -2,6 +2,7 @@ package java2typescript.jackson.module;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -70,8 +71,24 @@ public class TypeUtil {
 	}
 
 	private static JavaType getJavaTypeFromClass(Class<?> clazz) {
-		TypeBindings bindings = new TypeBindings(TypeFactory.defaultInstance(), clazz);
-		return bindings.resolveType(clazz);
+		TypeBindings bindings = createBindingsFromClass(clazz);
+		return TypeFactory.defaultInstance().constructType(clazz, bindings);
+	}
+
+	public static TypeBindings createBindingsFromClass(Class<?> clazz) {
+		JavaType[] javaTypeParameters = getGenericTypeParamsAsJavaType(clazz);
+		return TypeBindings.create(clazz, javaTypeParameters);
+	}
+
+	private static JavaType[] getGenericTypeParamsAsJavaType(Class<?> clazz) {
+		TypeFactory typeFactory = TypeFactory.defaultInstance();
+		TypeVariable<? extends Class<?>>[] typeParameters = clazz.getTypeParameters();
+		if (typeParameters == null || typeParameters.length == 0) {
+			return null;
+		}
+		return Arrays.stream(typeParameters)
+				.map(typeFactory::constructType)
+				.toArray(JavaType[]::new);
 	}
 
 	public static Class<?> getClass(Type type) {
