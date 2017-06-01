@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
+import com.google.common.base.Preconditions;
 import java2typescript.jackson.module.grammar.base.AbstractNamedType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
 import java2typescript.jackson.module.writer.InternalModuleFormatWriter;
@@ -42,6 +43,17 @@ public class Module {
 
 	public Map<String, AbstractNamedType> getNamedTypes() {
 		return namedTypes;
+	}
+
+	public AbstractNamedType getNamedType(String typeName) {
+		return namedTypes.get(typeName);
+	}
+
+	public void addNamedType(String typeName, AbstractNamedType namedType, Class<?> originalClass) {
+		Preconditions
+				.checkNotNull(originalClass, "Please provide original java class that was used to create the named type");
+		namedType.setOriginalClass(originalClass);
+		namedTypes.put(typeName, namedType);
 	}
 
 	public Map<String, AbstractType> getVars() {

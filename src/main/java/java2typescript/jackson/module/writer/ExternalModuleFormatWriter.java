@@ -2,7 +2,9 @@ package java2typescript.jackson.module.writer;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
 
 import java2typescript.jackson.module.grammar.EnumType;
@@ -16,6 +18,7 @@ import java2typescript.jackson.module.grammar.base.AbstractType;
 public class ExternalModuleFormatWriter implements ModuleWriter {
 
 	public WriterPreferences preferences = new WriterPreferences();
+	private List<Class<?>> providedTypes = new ArrayList<>();
 
 	@Override
 	public void write(Module module, Writer writer) throws IOException {
@@ -32,6 +35,9 @@ public class ExternalModuleFormatWriter implements ModuleWriter {
 			namedTypes = SortUtil.sortByTypeName(namedTypes);
 		}
 		for (AbstractNamedType type : namedTypes) {
+			if (providedTypes.contains(type.getOriginalClass())) {
+				continue;
+			}
 			writer.write(preferences.getIndentation() + "export ");
 			type.writeDef(writer, preferences);
 			writer.write("\n\n");
@@ -76,6 +82,17 @@ public class ExternalModuleFormatWriter implements ModuleWriter {
 		writer.write(preferences.getIndentation() + "toString(){ return this.name; }\n");
 		preferences.decreaseIndention();
 		writer.write(preferences.getIndentation() + "}\n");
+	}
+
+	/**
+	 * Can be used to exclude given types from generated output
+	 */
+	public void setProvidedTypes(List<Class<?>> providedTypes) {
+		this.providedTypes = providedTypes;
+	}
+
+	public List<Class<?>> getProvidedTypes() {
+		return providedTypes;
 	}
 
 }

@@ -24,9 +24,18 @@ import java2typescript.jackson.module.writer.WriterPreferences;
 abstract public class AbstractNamedType extends AbstractType {
 
 	protected final String name;
+	protected Class<?> originalClass;
 
 	public AbstractNamedType(String className) {
 		this.name = className;
+	}
+
+	public void setOriginalClass(Class<?> originalClass) {
+		this.originalClass = originalClass;
+	}
+
+	public Class<?> getOriginalClass() {
+		return originalClass;
 	}
 
 	@Override
