@@ -45,7 +45,7 @@ public class FunctionTypeWriter implements CustomAbstractTypeWriter {
 		functionType.getResultType().write(writer);
 	}
 
-	private void writeParameters(Writer writer, LinkedHashMap<String, AbstractType> parameters) throws IOException {
+	protected void writeParameters(Writer writer, LinkedHashMap<String, AbstractType> parameters) throws IOException {
 		writer.write("(");
 		int i = 1;
 		for (Entry<String, AbstractType> entry : parameters.entrySet()) {
