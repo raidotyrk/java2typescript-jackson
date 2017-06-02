@@ -150,6 +150,7 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 		TypeResolutionContext.Basic basicCtxt = new TypeResolutionContext.Basic(TypeFactory.defaultInstance(), null);
 		AnnotatedMethod annotMethod = new AnnotatedMethod(basicCtxt, method, new AnnotationMap(), null);
 
+		function.setOriginalJavaClassMethod(method);
 		function.setResultType(getTSTypeForClass(annotMethod));
 		for (int i = 0; i < annotMethod.getParameterCount(); i++) {
 			AnnotatedParameter param = annotMethod.getParameter(i);

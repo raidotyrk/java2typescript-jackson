@@ -5,7 +5,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import java2typescript.jackson.module.grammar.base.AbstractNamedType;
+import java2typescript.jackson.module.grammar.base.AbstractType;
 
 public class WriterPreferences {
 	private String indentationStep = "    ";
@@ -63,15 +63,15 @@ public class WriterPreferences {
 		return customWriters;
 	}
 
-	public boolean hasCustomWriter(AbstractNamedType type) {
+	public boolean hasCustomWriter(AbstractType type) {
 		return getCustomWriter(type) != null;
 	}
 
-	public void writeDef(AbstractNamedType type, Writer writer) throws IOException {
+	public void writeDef(AbstractType type, Writer writer) throws IOException {
 		getCustomWriter(type).writeDef(type, writer, this);
 	}
 
-	public CustomAbstractTypeWriter getCustomWriter(AbstractNamedType type) {
+	public CustomAbstractTypeWriter getCustomWriter(AbstractType type) {
 		for (CustomAbstractTypeWriter writer : customWriters) {
 			if (writer.accepts(type, this)) {
 				return writer;
