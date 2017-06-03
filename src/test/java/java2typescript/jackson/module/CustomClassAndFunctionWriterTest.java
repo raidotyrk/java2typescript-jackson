@@ -98,9 +98,7 @@ public class CustomClassAndFunctionWriterTest {
 
 	@Test
 	public void canReplaceClassAndFunctionWriter() throws IOException {
-		// Arrange
-		Configuration conf = new Configuration();
-		Module module = TestUtil.createTestModule(conf, MyController.class, RegularClass.class);
+		Module module = TestUtil.createTestModule(null, MyController.class, RegularClass.class);
 
 		ExternalModuleFormatWriter moduleWriter = new ExternalModuleFormatWriter();
 		moduleWriter.preferences.addWriter(new FunctionWithMethodBodyWriter());

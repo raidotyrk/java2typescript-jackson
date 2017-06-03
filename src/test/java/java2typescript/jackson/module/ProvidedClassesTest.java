@@ -18,9 +18,14 @@ public class ProvidedClassesTest {
 	}
 
 	static class Provided1 {
+		public NotProvidedReferencedOnlyFromProvided1 typesReferencedFromProvidedShouldBeEmitted;
 	}
 
 	static class NotProvided1 {
+	}
+
+	static class NotProvidedReferencedOnlyFromProvided1 {
+		public Provided1 fieldProvided1;
 	}
 
 	static class NotProvided1ReferencesProvided2 {
