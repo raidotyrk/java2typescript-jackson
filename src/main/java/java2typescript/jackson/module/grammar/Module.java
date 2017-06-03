@@ -23,14 +23,20 @@ import com.google.common.base.Preconditions;
 import java2typescript.jackson.module.grammar.base.AbstractNamedType;
 import java2typescript.jackson.module.grammar.base.AbstractType;
 import java2typescript.jackson.module.writer.InternalModuleFormatWriter;
+import lombok.Getter;
+import lombok.Setter;
 
 public class Module {
 
+	@Getter
+	@Setter
 	private String name;
 
-	private Map<String, AbstractNamedType> namedTypes = new HashMap<String, AbstractNamedType>();
+	@Getter
+	private Map<String, AbstractNamedType> namedTypes = new HashMap<>();
 
-	private Map<String, AbstractType> vars = new HashMap<String, AbstractType>();
+	@Getter
+	private Map<String, AbstractType> vars = new HashMap<>();
 
 	private Deque<Class<?>> classesToParse = new LinkedList<>();
 
@@ -39,10 +45,6 @@ public class Module {
 
 	public Module(String name) {
 		this.name = name;
-	}
-
-	public Map<String, AbstractNamedType> getNamedTypes() {
-		return namedTypes;
 	}
 
 	public AbstractNamedType getNamedType(String typeName) {
@@ -54,18 +56,6 @@ public class Module {
 				.checkNotNull(originalClass, "Please provide original java class that was used to create the named type");
 		namedType.setOriginalClass(originalClass);
 		namedTypes.put(typeName, namedType);
-	}
-
-	public Map<String, AbstractType> getVars() {
-		return vars;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	public void write(Writer writer) throws IOException {
