@@ -34,6 +34,9 @@ dependencies {
 	compileOnly(
 			"org.projectlombok:lombok:1.16.16", // generates boilerplate methods, such as getters/setter/equals/hashcode
 	)
+	testCompileOnly(
+			"org.projectlombok:lombok:1.16.16", // generates boilerplate methods, such as getters/setter/equals/hashcode
+	)
 	compile(
 			"com.fasterxml.jackson.core:jackson-annotations:$jacksonCoreVersion",
 			"com.fasterxml.jackson.core:jackson-databind:$jacksonCoreVersion",
