@@ -11,7 +11,7 @@ plugins {
 	id "com.gorylenko.gradle-git-properties" version "1.4.17"
 }
 
-group 'com.github.atsu85.java2typescript-jackson'
+group 'com.github.atsu85'
 
 
 ext {
@@ -19,6 +19,7 @@ ext {
 	snapshotSuffix = "c<count>" // used by semver-git plugin when there are commits after previous tag
 }
 apply plugin: 'com.cinnober.gradle.semver-git' // derive gradle project version based on git tag
+apply plugin: 'maven-publish' // to be able to publish this project to local maven repository (only meant for testing the build locally)
 println("Project version (based on semver-git): " + project.version)
 
 
@@ -34,6 +35,9 @@ dependencies {
 	compileOnly(
 			"org.projectlombok:lombok:1.16.16", // generates boilerplate methods, such as getters/setter/equals/hashcode
 	)
+	testCompileOnly(
+			"org.projectlombok:lombok:1.16.16", // generates boilerplate methods, such as getters/setter/equals/hashcode
+	)
 	compile(
 			"com.fasterxml.jackson.core:jackson-annotations:$jacksonCoreVersion",
 			"com.fasterxml.jackson.core:jackson-databind:$jacksonCoreVersion",
@@ -44,4 +48,17 @@ dependencies {
 	testCompile(
 			'junit:junit:4.8.2',
 	)
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+			version project.version + "-SNAPSHOT"
+		}
+	}
+}
+
+publishToMavenLocal.doLast {
+	println("The published artifact can be consumed by other local maven projects from local maven repo using ${project.group}:${project.name}:${project.version}-SNAPSHOT")
 }
