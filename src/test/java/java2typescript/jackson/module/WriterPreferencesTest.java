@@ -38,7 +38,7 @@ public class WriterPreferencesTest {
 	static class Dummy {
 		public String _String;
 	}
-	
+
 	static class Constants {
 		// constants in non-alfabetic order
 		public static final String MY_CONSTANT_STRING = "stringValue";
@@ -48,7 +48,7 @@ public class WriterPreferencesTest {
 	static class TestClassHasMapWithEnumKey {
 		public Map<Enum, String> enumKeyMap;
 	}
-	
+
 	enum E{B,C,A}
 
 
@@ -57,6 +57,17 @@ public class WriterPreferencesTest {
 		// Arrange
 		ExternalModuleFormatWriter mWriter = new ExternalModuleFormatWriter();
 		mWriter.preferences.useEnumPattern();
+
+		Module module = TestUtil.createTestModule(null, Enum.class);
+
+		ExpectedOutputChecker.writeAndCheckOutputFromFile(module, mWriter);
+	}
+
+	@Test
+	public void enumToStringValuedEnum() throws IOException {
+		// Arrange
+		ExternalModuleFormatWriter mWriter = new ExternalModuleFormatWriter();
+		mWriter.preferences.useStringValuedEnum();
 
 		Module module = TestUtil.createTestModule(null, Enum.class);
 

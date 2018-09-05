@@ -37,20 +37,24 @@ public class WriterPreferences {
 	public boolean isConstantsForStringLiteralTypeEnums() {
 		return this.constantsForStringLiteralTypeEnums;
 	}
-	
+
 	public void useEnumPattern() {
 		addWriter(new EnumTypeToEnumPatternWriter());
 		useEnumPattern = true;
 	}
 
+	public void useStringValuedEnum() {
+		addWriter(new EnumTypeToStringValuedEnumWriter());
+	}
+
 	public boolean isUseEnumPattern() {
 		return useEnumPattern;
 	}
-	
+
 	public void sort() {
 		sort = true;
 	}
-	
+
 	public boolean isSort() {
 		return sort;
 	}
