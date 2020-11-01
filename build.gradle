@@ -15,7 +15,7 @@ group 'com.github.atsu85'
 
 
 ext {
-	jacksonCoreVersion = "2.8.8"
+	jacksonCoreVersion = "2.11.3"
 	snapshotSuffix = "c<count>" // used by semver-git plugin when there are commits after previous tag
 }
 apply plugin: 'com.cinnober.gradle.semver-git' // derive gradle project version based on git tag

@@ -317,7 +317,7 @@ public class TSJsonObjectFormatVisitor extends ABaseTSJsonFormatVisitor<ClassTyp
 
 	private Type getGenericType(BeanProperty writer) {
 		AnnotatedMember member = writer.getMember();
-		Type genericType = member.getGenericType();
+		Type genericType = member.getType();
 		if(genericType instanceof ParameterizedType || genericType instanceof TypeVariable) {
 			return genericType;
 		}
